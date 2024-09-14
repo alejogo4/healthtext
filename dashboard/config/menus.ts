@@ -1015,12 +1015,12 @@ export const menusConfig = {
           {
             title: 'Nuevo proveedor',
             icon: Components,
-            href: '/chat'
+            href: '/supplier/create'
           },
           {
             title: 'Listar proveedores',
             icon: Envelope,
-            href: '/email'
+            href: '/supplier/list'
           }
         ]
       },
@@ -1031,12 +1031,12 @@ export const menusConfig = {
           {
             title: 'Crear cliente',
             icon: UserPlus,
-            href: '/chat'
+            href: '/client/create'
           },
           {
             title: 'Listar clientes',
             icon: ListFill,
-            href: '/chat'
+            href: '/client/list'
           }
         ]
       },
