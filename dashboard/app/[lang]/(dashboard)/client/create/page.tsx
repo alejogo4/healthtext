@@ -12,10 +12,11 @@ import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { faker } from '@faker-js/faker';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 const Page = () => {
   const [activeStep, setActiveStep] = React.useState<number>(0);
 
-  const steps = ['Datos Básicos', 'Dirección', 'Datos Fiscales', 'Contactos'];
+  const steps = ['Datos Básicos', 'Dirección','Contactos'];
 
   const isStepOptional = (step: number) => {
     return step === 1;
@@ -50,11 +51,7 @@ const Page = () => {
     { value: 'natural', label: 'Natural' }
   ];
 
-  const type_payment = [
-    { value: 'efectivo', label: 'Efectivo' },
-    { value: 'transferencia', label: 'Transferencia' },
-    { value: 'cheque', label: 'Cheque' }
-  ];
+ 
 
   return (
     <div className='mt-4'>
@@ -150,72 +147,14 @@ const Page = () => {
                   <div className='col-span-12 lg:col-span-6'>
                     <Input type='text' placeholder='Dirección Empresa' />
                   </div>
+                  <div className='col-span-12 lg:col-span-6'>
+                    <Label className="mb-3" htmlFor="birthday">Fecha de nacimiento</Label>
+                    <Input aria-label='Fecha nacimiento' name='birthday' type='date' placeholder='Fecha nacimiento' />
+                  </div>
                 </>
               )}
+              
               {activeStep === 2 && (
-                <>
-                  <div className='col-span-12 lg:col-span-4'>
-                    <Checkbox id='checkbox_1'>
-                      ¿Está registrado en el régimen simple de tributación?
-                    </Checkbox>
-                  </div>
-                  <div className='col-span-12 lg:col-span-4'>
-                    <Checkbox id='checkbox_2'>¿Es gran contribuyente?</Checkbox>
-                  </div>
-                  <div className='col-span-12 lg:col-span-4'>
-                    <Checkbox id='checkbox_3'>¿Es responsable de IVA?</Checkbox>
-                  </div>
-                  <div className='col-span-12 lg:col-span-4'>
-                    <Checkbox id='checkbox_4'>
-                      En la venta NO POS causar RETEIVA a Resp. de IVA no
-                      registrado en el Rég. Simple
-                    </Checkbox>
-                  </div>
-                  <div className='col-span-12 lg:col-span-4'>
-                    <Checkbox id='checkbox_5'>
-                      En la venta NO POS causar RETEIVA a Resp. de IVA
-                      registrado en el Rég. Simple
-                    </Checkbox>
-                  </div>
-                  <div className='col-span-12 lg:col-span-4'>
-                    <Checkbox id='checkbox_6'>
-                      En la venta NO POS causar RETENCIÓN EN LA FUENTE por renta
-                    </Checkbox>
-                  </div>
-                  <div className='col-span-12 lg:col-span-4'>
-                    <Checkbox id='checkbox_7'>
-                      En la venta NO POS causar RETENCIÓN EN LA FUENTE por ICA
-                    </Checkbox>
-                  </div>
-                  <hr />
-                  <div className='col-span-12'></div>
-
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Régimen Tributario' />
-                  </div>
-
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Datos Bancarios' />
-                  </div>
-
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Documentos Anexos' />
-                  </div>
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Nacionalidad' />
-                  </div>
-
-                  <div className='col-span-12 lg:col-span-6'>
-                    <SelectReact
-                      className='react-select'
-                      classNamePrefix='select'
-                      options={type_payment}
-                      placeholder='Opción de pago'
-                    />
-                  </div>
-                </>
-              )}
-              {activeStep === 3 && (
                 <>
                   <div className='col-span-12 lg:col-span-6'>
                     <Input type='text' placeholder='Nombre' />
@@ -225,37 +164,29 @@ const Page = () => {
                     <Input type='email' placeholder='Correo' />
                   </div>
 
+                  <div className='col-span-12 lg:col-span-6'>
+                    <Input type='text' placeholder='Extensión' />
+                  </div>
+
 
                   <div className='col-span-12 lg:col-span-6'>
                     <Input type='text' placeholder='Teléfono' />
                   </div>
 
                   <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Extensión' />
-                  </div>
-
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='email' placeholder='Correo Alternativo' />
+                    <Input type='text' placeholder='Celular' />
                   </div>
 
                   <div className='col-span-12 lg:col-span-6'>
                     <Input type='text' placeholder='Cargo Empresa' />
                   </div>
-
+                  
                   <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Celular' />
-                  </div>
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Website' />
+                    <Input type='email' placeholder='Correo Alternativo' />
                   </div>
 
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Facebook' />
-                  </div>
-
-                  <div className='col-span-12 lg:col-span-6'>
-                    <Input type='text' placeholder='Twitter' />
-                  </div>
+                  
+              
                 </>
               )}
             </div>
