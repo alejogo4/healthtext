@@ -22,7 +22,7 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
   return (
     <div className="flex flex-1 flex-wrap items-center gap-2">
       <Input
-        placeholder="Filter tasks..."
+        placeholder="Buscar"
         value={table.getColumn("title")?.getFilterValue() as string || ""}
         onChange={handleFilterChange}
         className="h-8 min-w-[200px] max-w-sm"
