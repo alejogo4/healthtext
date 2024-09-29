@@ -1,1 +1,1 @@
-export { default } from '@/views/supplier/supplierCreate'
+export { default } from '@/views/supplier/supplierCreatePage'

@@ -1,28 +1,25 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
 import { Row } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
 interface DataTableRowActionsProps {
   row: Row<any>;
+  onPressEdit?:()=>void;
+  onPressView?:()=>void;
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export function DataTableRowActions({ row,onPressEdit,onPressView }: DataTableRowActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -35,8 +32,8 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Editar</DropdownMenuItem>
-        <DropdownMenuItem>Ver</DropdownMenuItem>
+        <DropdownMenuItem onClick={onPressEdit}>Editar</DropdownMenuItem>
+        <DropdownMenuItem onClick={onPressView}>Ver</DropdownMenuItem>
         {/* <DropdownMenuItem>Favorite</DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
