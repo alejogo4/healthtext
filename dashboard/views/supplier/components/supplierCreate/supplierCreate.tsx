@@ -66,7 +66,7 @@ export interface ContactInfo {
 
 export interface FormType {
   name: string;
-  document_type_id: { value: string };
+  document_type_id: { value: string, label: string };
   document_number: string;
   url_website: string;
   url_facebook: string;
@@ -181,7 +181,7 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      document_type_id: { value: '' },
+      document_type_id: { value: '', label: '' },
       document_number: '',
       url_website: '',
       url_facebook: '',
@@ -262,6 +262,7 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
             {errorMessages}
           </div>
         )} */}
+
         {steps.map((label, index) => {
           const stepProps: any = {};
           const labelProps: any = {};
@@ -341,14 +342,14 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                             <FormItem>
                               <FormLabel>
                                 {' '}
-                                {typePerson?.value == 'JURIDICA'
+                                {typePerson?.label == 'JURIDICA'
                                   ? 'NIT'
                                   : 'Documento'}
                               </FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={
-                                    typePerson?.value == 'JURIDICA'
+                                    typePerson?.label == 'JURIDICA'
                                       ? 'NIT'
                                       : 'Documento'
                                   }

@@ -46,7 +46,7 @@ export interface ContactInfo {
 }
 
 export interface FormType {
-  document_type_id: { value: string };
+  document_type_id: { value: string, label: string };
   document_number: string;
   name: string;
   payment_currency: { value: string };
@@ -209,14 +209,14 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                             <FormItem>
                               <FormLabel>
                                 {' '}
-                                {typePerson?.value == 'JURIDICA'
+                                {typePerson?.label == 'JURIDICA'
                                   ? 'NIT'
                                   : 'Documento'}
                               </FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={
-                                    typePerson?.value == 'JURIDICA'
+                                    typePerson?.label == 'JURIDICA'
                                       ? 'NIT'
                                       : 'Documento'
                                   }

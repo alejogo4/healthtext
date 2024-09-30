@@ -164,7 +164,7 @@ const LogInForm = () => {
           size={!isDesktop2xl ? 'lg' : 'md'}
         >
           {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-          {isPending ? 'Cargando...' : 'Iniciar'}
+          {isPending ? 'Loading...' : 'Sign In'}
         </Button>
       </form>
     </div>
