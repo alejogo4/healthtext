@@ -52,6 +52,7 @@ export const mapFormToClientCreate = (formData: FormType): ClientCreate => {
     way_to_meet_them,
     email,
     date_birth,
+    person_type_id,
     contact_info: contactList,
   } = formData;
 
@@ -68,7 +69,7 @@ export const mapFormToClientCreate = (formData: FormType): ClientCreate => {
 
   
   return {
-    person_type_id: Number(1),
+    person_type_id: Number(person_type_id.value),
     document_type_id: Number(document_type_id.value), 
     document_number: Number(document_number),
     name,
@@ -80,9 +81,9 @@ export const mapFormToClientCreate = (formData: FormType): ClientCreate => {
     full_address,
     profession_specialty,
     authorizes_receive_information,
-    where_authorize: where_authorize.value, 
-    way_to_meet_them: way_to_meet_them.value, 
-    payment_currency: payment_currency.value, 
+    where_authorize: where_authorize?.value, 
+    way_to_meet_them: way_to_meet_them?.value, 
+    payment_currency: payment_currency?.value, 
     date_birth:convertToDDMMYYYY(date_birth) , 
     email,
     cellphone: contactList[0]?.mobile || "",

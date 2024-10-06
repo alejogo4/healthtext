@@ -25,6 +25,7 @@ const contactSchema = z.object({
 // Esquema de validación para el formulario principal
 export const formSchema = z.object({
   document_type_id: z.any(),
+  person_type_id: z.any(),
   document_number: z
     .string()
     .min(1, 'El número de documento es obligatorio')

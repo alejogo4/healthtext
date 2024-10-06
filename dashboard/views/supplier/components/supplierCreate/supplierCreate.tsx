@@ -66,7 +66,8 @@ export interface ContactInfo {
 
 export interface FormType {
   name: string;
-  document_type_id: { value: string, label: string };
+  person_type_id: { value: string; label: string };
+  document_type_id: { value: string; label: string };
   document_number: string;
   url_website: string;
   url_facebook: string;
@@ -81,8 +82,8 @@ export interface FormType {
   type_account: string;
   bank: string;
   account_number: string;
-  nationality: string;
-  attached_documents: string;
+  nationality?: string;
+  attached_documents: string[];
   payment_option: { value: string };
   invoice_deadline: { value: string };
   type_service: [{ value: string }];
@@ -122,6 +123,9 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
   const [activeStep, setActiveStep] = React.useState<number>(0);
 
   const steps = ['Datos Básicos', 'Dirección', 'Datos Fiscales', 'Contactos'];
+  const [documents, setDocuments] = React.useState<
+    { name: string; extension: string; fileBase64: string }[]
+  >([]);
 
   const isStepOptional = (step: number) => {
     return step === 1;
@@ -140,8 +144,8 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
   };
 
   const onSubmit = async (data: any) => {
-    console.log(data);
-    const response = await createSupplier(mapToSupplierCreate(data));
+    const _data = { ...data, attached_documents: documents };
+    const response = await createSupplier(mapToSupplierCreate(_data));
     handleNext();
     toast({
       title: response?.message
@@ -181,6 +185,7 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      person_type_id: { value: '', label: '' },
       document_type_id: { value: '', label: '' },
       document_number: '',
       url_website: '',
@@ -196,11 +201,10 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
       type_account: '',
       bank: '',
       account_number: '',
-      nationality: '',
-      attached_documents: '',
+      attached_documents: [],
       payment_option: { value: '' },
       invoice_deadline: { value: '' },
-      type_service: [{ value: '' }], // Inicializar como un array con un objeto vacío
+      type_service: [], // Inicializar como un array con un objeto vacío
       contact_info: [
         {
           name_contact: '',
@@ -233,22 +237,43 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
     ...formMethods
   } = form;
 
   const typePerson = watch('document_type_id');
 
-  // const errorMessages = Object.keys(errors).map(key => {
-  //   const fieldError = errors[key];
-  //   return (
-  //     <p key={key}>
-  //       {fieldError?.message} {/* Mensaje de error */}
-  //       <br />
-  //       <strong>Campo:</strong> {key} {/* Nombre del campo */}
-  //     </p>
-  //   );
-  // });
+  const errorMessages = Object.keys(errors).map(key => {
+    const fieldError = errors[key as keyof typeof errors];
+    return <p key={key}>{fieldError?.message}</p>;
+  });
+
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const base64Files = await Promise.all(
+        Array.from(files).map(async file => {
+          const base64 = await toBase64(file);
+          return {
+            name: file.name,
+            extension: file.name.split('.').pop() || '',
+            fileBase64: base64
+          };
+        })
+      );
+      setDocuments(base64Files);
+    }
+  };
+
+  const toBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
 
   return (
     <div className='mt-4'>
@@ -256,13 +281,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
         current={activeStep}
         direction={isTablet ? 'vertical' : 'horizontal'}
       >
-        {/* {errorMessages.length > 0 && (
-          <div style={{ color: 'red' }}>
-            <h3>Errores:</h3>
-            {errorMessages}
-          </div>
-        )} */}
-
         {steps.map((label, index) => {
           const stepProps: any = {};
           const labelProps: any = {};
@@ -313,7 +331,7 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                       <div className='col-span-12 lg:col-span-6'>
                         <Controller
                           control={form.control}
-                          name='document_type_id'
+                          name='person_type_id'
                           render={({
                             field: { onChange, onBlur, value, ref }
                           }) => (
@@ -329,7 +347,29 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   value={value}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className='col-span-12 lg:col-span-6'>
+                        <Controller
+                          control={form.control}
+                          name='document_type_id'
+                          render={({
+                            field: { onChange, onBlur, value, ref }
+                          }) => (
+                            <FormItem>
+                              <FormLabel>Tipo de Documento</FormLabel>
+                              <FormControl>
+                                <SelectReact
+                                  className='react-select'
+                                  classNamePrefix='select'
+                                  options={arrayToReactSelect(documentTypes)}
+                                  onChange={onChange}
+                                  onBlur={onBlur}
+                                  value={value}
+                                />
+                              </FormControl>
                             </FormItem>
                           )}
                         />
@@ -360,7 +400,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -390,75 +429,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className='col-span-12 lg:col-span-6'>
-                        <FormField
-                          control={form.control}
-                          name='url_website'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Website</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder='Website'
-                                  {...field}
-                                  className={cn('', {
-                                    'border-destructive focus:border-destructive':
-                                      form.formState.errors.url_website
-                                  })}
-                                />
-                              </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className='col-span-12 lg:col-span-6'>
-                        <FormField
-                          control={form.control}
-                          name='url_facebook'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Facebook</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder='Facebook'
-                                  {...field}
-                                  className={cn('', {
-                                    'border-destructive focus:border-destructive':
-                                      form.formState.errors.url_facebook
-                                  })}
-                                />
-                              </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className='col-span-12 lg:col-span-6'>
-                        <FormField
-                          control={form.control}
-                          name='url_twitter'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Twitter</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder='Twitter'
-                                  {...field}
-                                  className={cn('', {
-                                    'border-destructive focus:border-destructive':
-                                      form.formState.errors.url_twitter
-                                  })}
-                                />
-                              </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -483,7 +453,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   ref={ref}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -509,7 +478,71 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   ref={ref}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className='col-span-12 lg:col-span-6'>
+                        <FormField
+                          control={form.control}
+                          name='url_website'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Website</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder='Website'
+                                  {...field}
+                                  className={cn('', {
+                                    'border-destructive focus:border-destructive':
+                                      form.formState.errors.url_website
+                                  })}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className='col-span-12 lg:col-span-6'>
+                        <FormField
+                          control={form.control}
+                          name='url_facebook'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Facebook</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder='Facebook'
+                                  {...field}
+                                  className={cn('', {
+                                    'border-destructive focus:border-destructive':
+                                      form.formState.errors.url_facebook
+                                  })}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className='col-span-12 lg:col-span-6'>
+                        <FormField
+                          control={form.control}
+                          name='url_twitter'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Twitter</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder='Twitter'
+                                  {...field}
+                                  className={cn('', {
+                                    'border-destructive focus:border-destructive':
+                                      form.formState.errors.url_twitter
+                                  })}
+                                />
+                              </FormControl>
                             </FormItem>
                           )}
                         />
@@ -535,7 +568,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -558,7 +590,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -581,7 +612,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -604,7 +634,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -619,6 +648,7 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                               <FormLabel>Código Postal</FormLabel>
                               <FormControl>
                                 <Input
+                                  type='number'
                                   placeholder='Código Postal'
                                   {...field}
                                   className={cn('', {
@@ -627,7 +657,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -650,7 +679,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -707,7 +735,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -733,7 +760,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   value={value}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -756,7 +782,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -779,7 +804,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -795,38 +819,16 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                               <FormControl>
                                 <Input
                                   placeholder='Documentos Anexos'
+                                  multiple={true}
                                   type='file'
                                   {...field}
+                                  onChange={onFileChange}
                                   className={cn('', {
                                     'border-destructive focus:border-destructive':
                                       form.formState.errors.attached_documents
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className='col-span-12 lg:col-span-6'>
-                        <FormField
-                          control={form.control}
-                          name='nationality'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nacionalidad</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder='Nacionalidad'
-                                  {...field}
-                                  className={cn('', {
-                                    'border-destructive focus:border-destructive':
-                                      form.formState.errors.nationality
-                                  })}
-                                />
-                              </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -851,7 +853,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   value={value}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -888,7 +889,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -912,7 +912,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -936,7 +935,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -952,6 +950,7 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   <FormControl>
                                     <Input
                                       placeholder='Teléfono'
+                                      type='number'
                                       {...field}
                                       className={cn('', {
                                         'border-destructive focus:border-destructive':
@@ -960,7 +959,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -984,7 +982,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -1000,6 +997,7 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   <FormControl>
                                     <Input
                                       placeholder='Celular'
+                                      type='number'
                                       {...field}
                                       className={cn('', {
                                         'border-destructive focus:border-destructive':
@@ -1008,7 +1006,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -1033,7 +1030,6 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -1076,6 +1072,14 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                         </Button>
                       </div>
                     </>
+                  )}
+                </div>
+                <div>
+                  {errorMessages.length > 0 && (
+                    <div style={{ color: 'red' }}>
+                      <h3 className='font-bold mb-4'>Errores:</h3>
+                      {errorMessages}
+                    </div>
                   )}
                 </div>
 

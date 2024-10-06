@@ -46,7 +46,8 @@ export interface ContactInfo {
 }
 
 export interface FormType {
-  document_type_id: { value: string, label: string };
+  person_type_id: { value: string; label: string };
+  document_type_id: { value: string; label: string };
   document_number: string;
   name: string;
   payment_currency: { value: string };
@@ -102,9 +103,7 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
   };
   const isTablet = useMediaQuery('(max-width: 1024px)');
 
-  const form = useForm<FormType>(
-    {resolver: zodResolver(formSchema)}
-  );
+  const form = useForm<FormType>({ resolver: zodResolver(formSchema) });
 
   const {
     register,
@@ -122,6 +121,11 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'contact_info'
+  });
+
+  const errorMessages = Object.keys(errors).map(key => {
+    const fieldError = errors[key as keyof typeof errors];
+    return <p key={key}>{fieldError?.message}</p>;
   });
 
   return (
@@ -180,7 +184,7 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                       <div className='col-span-12 lg:col-span-6'>
                         <Controller
                           control={form.control}
-                          name='document_type_id'
+                          name='person_type_id'
                           render={({
                             field: { onChange, onBlur, value, ref }
                           }) => (
@@ -196,7 +200,29 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   value={value}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className='col-span-12 lg:col-span-6'>
+                        <Controller
+                          control={form.control}
+                          name='document_type_id'
+                          render={({
+                            field: { onChange, onBlur, value, ref }
+                          }) => (
+                            <FormItem>
+                              <FormLabel>Tipo de Documento</FormLabel>
+                              <FormControl>
+                                <SelectReact
+                                  className='react-select'
+                                  classNamePrefix='select'
+                                  options={arrayToReactSelect(documentTypes)}
+                                  onChange={onChange}
+                                  onBlur={onBlur}
+                                  value={value}
+                                />
+                              </FormControl>
                             </FormItem>
                           )}
                         />
@@ -227,7 +253,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -257,7 +282,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -280,7 +304,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -304,7 +327,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -332,7 +354,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   value={value}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -354,7 +375,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -379,7 +399,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   value={value}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -430,7 +449,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                     value={value}
                                   />
                                 </FormControl>
-                                <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                               </FormItem>
                             )}
                           />
@@ -457,7 +475,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -480,7 +497,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -503,7 +519,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -526,7 +541,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -542,6 +556,7 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                               <FormControl>
                                 <Input
                                   placeholder='Código Postal'
+                                  type='number'
                                   {...field}
                                   className={cn('', {
                                     'border-destructive focus:border-destructive':
@@ -549,7 +564,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -572,7 +586,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   })}
                                 />
                               </FormControl>
-                              <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                             </FormItem>
                           )}
                         />
@@ -609,7 +622,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -633,7 +645,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -657,7 +668,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -672,6 +682,7 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   <FormLabel>Teléfono</FormLabel>
                                   <FormControl>
                                     <Input
+                                      type='number'
                                       placeholder='Teléfono'
                                       {...field}
                                       className={cn('', {
@@ -681,7 +692,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -705,7 +715,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -721,6 +730,7 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   <FormControl>
                                     <Input
                                       placeholder='Celular'
+                                      type='number'
                                       {...field}
                                       className={cn('', {
                                         'border-destructive focus:border-destructive':
@@ -729,7 +739,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -744,7 +753,7 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                   <FormLabel>Correo Alternativo</FormLabel>
                                   <FormControl>
                                     <Input
-                                      type='alternate_mail'
+                                      type='email'
                                       placeholder='Correo Alternativo'
                                       {...field}
                                       className={cn('', {
@@ -754,7 +763,6 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                                       })}
                                     />
                                   </FormControl>
-                                  <FormMessage className='bg-destructive/90 text-primary-foreground text-[10px] inline-flex justify-center items-center font-base h-[22px] px-2 rounded-sm ' />
                                 </FormItem>
                               )}
                             />
@@ -798,6 +806,14 @@ const ClientCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                         </Button>
                       </div>
                     </>
+                  )}
+                </div>
+                <div>
+                  {errorMessages.length > 0 && (
+                    <div style={{ color: 'red' }}>
+                      <h3 className='font-bold mb-4'>Errores:</h3>
+                      {errorMessages}
+                    </div>
                   )}
                 </div>
                 {activeStep === steps.length - 1 && (

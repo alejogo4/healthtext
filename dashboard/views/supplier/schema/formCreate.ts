@@ -28,6 +28,7 @@ export const formSchema = z.object({
     .min(2, 'El nombre debe tener al menos 2 caracteres'),
 
   document_type_id: z.any(),
+  person_type_id: z.any(),
 
   document_number: z
     .string()
@@ -61,9 +62,8 @@ export const formSchema = z.object({
     .min(1, 'El número de cuenta es obligatorio')
     .regex(/^\d+$/, 'El número de cuenta debe ser numérico'),
 
-  nationality: z.string().min(1, 'La nacionalidad es obligatoria'),
 
-  attached_documents: z.string().optional(),
+  attached_documents: z.array(z.string()),
 
   payment_option: z.object({
     value: z.string().min(1, 'La opción de pago es obligatoria')
