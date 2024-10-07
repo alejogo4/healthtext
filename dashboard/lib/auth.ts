@@ -1,39 +1,68 @@
-import Credentials from 'next-auth/providers/credentials';
-
 import { loginService } from '@/services/login';
+import NextAuth, { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
-    Credentials({
-      name: 'credentials',
+    CredentialsProvider({
+      name: 'Laravel API',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        email: {
+          label: 'Email',
+          type: 'email',
+          placeholder: 'example@example.com'
+        },
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        const { email, password } = credentials as {
-          email: string;
-          password: string;
-        };
+        if (!credentials) return null;
 
-        const foundUser = await loginService({email, password})
+        try {
+          const { email, password } = credentials as {
+            email: string;
+            password: string;
+          };
 
-        if ( foundUser && !foundUser?.access_token) {
+          const foundUser = await loginService({ email, password });
+
+          if (foundUser) {
+            return {
+              id: credentials.email,
+              accessToken: foundUser.access_token,
+              tokenType: foundUser.token_type,
+              expiresIn: foundUser.expires_in
+            };
+          } else {
+            return null;
+          }
+        } catch (error) {
+          console.error('Error durante la autenticación:', error);
           return null;
         }
-
-      
-        if (foundUser && foundUser?.access_token) {
-          return foundUser as any;
-        }
-        return null;
       }
     })
   ],
-  secret: process.env.NEXTAUTH_SECRET,
-
   session: {
     strategy: 'jwt'
   },
-  debug: process.env.NODE_ENV !== 'production'
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.accessToken = user.accessToken;
+        token.tokenType = user.tokenType;
+        token.expiresIn = user.expiresIn;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.accessToken = token.accessToken;
+      session.tokenType = token.tokenType;
+      session.expiresIn = token.expiresIn;
+
+      return session;
+    }
+  },
+  secret: process.env.NEXTAUTH_SECRET
 };
+
+export default NextAuth(authOptions);

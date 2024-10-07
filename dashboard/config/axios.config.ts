@@ -1,6 +1,9 @@
+import { authOptions } from "@/lib/auth";
 import axios, { AxiosRequestConfig } from "axios";
+import { getServerSession } from "next-auth/next";
 
-const baseURL = process.env.NEXT_PUBLIC_SITE_URL + "/api"; 
+const baseURL = process.env.NEXT_PUBLIC_SITE_URL + "/api";
+const authUrl = process.env.NEXT_PUBLIC_URL
 
 export const api = axios.create({
   baseURL,
@@ -21,8 +24,14 @@ export const httpRequest = async <TResponse, TData = undefined>(
   data?: TData,
   method: AxiosRequestConfig['method'] = 'GET',
   token?: string
-): Promise<TResponse> => {
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+): Promise<TResponse> => {  
+
+  const authSession = await fetch(`${authUrl}/api/auth/session`);
+
+
+  const authJson = await authSession.json();
+  const headers = authJson && authJson.accessToken ? { Authorization: `Bearer ${authJson?.accessToken}` } : {};
+
 
   try {
     const response = await api({
@@ -50,6 +59,48 @@ export const httpRequest = async <TResponse, TData = undefined>(
     }
   }
 };
+
+
+
+export const httpRequestServer = async <TResponse, TData = undefined>(
+  url: string,
+  data?: TData,
+  method: AxiosRequestConfig['method'] = 'GET',
+  token?: string
+): Promise<TResponse> => {  
+
+  const session =  await getServerSession(authOptions)
+
+  const headers = session && session.accessToken ? { Authorization: `Bearer ${session?.accessToken}` } : {};
+
+
+  try {
+    const response = await api({
+      url,
+      method,
+      data,
+      headers,
+    });
+
+    return response.data as TResponse;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      // La solicitud se realizó y el servidor respondió con un código de estado
+      // que cae fuera del rango de 2xx
+      console.error('Error en la respuesta del servidor:', error.response.data);
+      throw new Error(error.response.data.message || 'Error en la solicitud');
+    } else if (axios.isAxiosError(error) && error.request) {
+      // La solicitud se realizó pero no se recibió respuesta
+      console.error('Error en la solicitud:', error.request);
+      throw new Error('No se recibió respuesta del servidor');
+    } else {
+      // Algo pasó al configurar la solicitud
+      console.error('Error:', error);
+      throw new Error('Error en la configuración de la solicitud');
+    }
+  }
+};
+
 
 
 export type ApiResponse<T> = {

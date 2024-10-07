@@ -5,19 +5,17 @@ import { DataTable } from '@/components/ui/datatable';
 import { DataTableColumnHeader } from '@/components/ui/datatable/data-table-column-header';
 import { DataTableRowActions } from '@/components/ui/datatable/data-table-row-actions';
 import { ColumnDef } from '@tanstack/react-table';
-import { DataRows } from './const/data';
 import { useEffect, useState } from 'react';
 import { ClientCreate } from '../types/client';
 
 import {
   Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
+  DialogContent
 } from '@/components/ui/dialog';
 import { listClient } from './services/crudClient';
 
 const ClientList = () => {
+
   const [data, setData] = useState<ClientCreate[] | []>([]);
   const [loading, setLoading] = useState(false);
 

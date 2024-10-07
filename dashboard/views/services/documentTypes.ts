@@ -1,4 +1,4 @@
-import { ApiResponse, fake_token, httpRequest } from '@/config/axios.config';
+import { ApiResponse, fake_token, httpRequest, httpRequestServer } from '@/config/axios.config';
 
 export interface DocumentTypes {
   id: number;
@@ -9,8 +9,7 @@ export interface DocumentTypes {
 
 export const fetchDocumentTypes = async () => {
   try {
-    const data = await httpRequest<ApiResponse<DocumentTypes[]>>('/documenttype', undefined, 'GET', fake_token);
-    console.log(data);
+    const data = await httpRequestServer<ApiResponse<DocumentTypes[]>>('/documenttype', undefined, 'GET');
     return data.data as DocumentTypes[];
   } catch (error) {
     console.error('Error al obtener datos:', error);

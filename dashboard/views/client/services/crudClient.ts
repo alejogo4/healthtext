@@ -6,8 +6,7 @@ export const createClient = async (body: any) => {
     const data = await httpRequest<ApiResponse<any>>(
       '/client',
       body,
-      'POST',
-      fake_token
+      'POST'
     );
     console.log(data);
     return data.data;
@@ -22,10 +21,8 @@ export const listClient = async () => {
     const data = await httpRequest<ApiResponse<ClientCreate[]>>(
       '/client',
       undefined,
-      'GET',
-      fake_token
+      'GET'
     );
-    console.log(data);
     return data.data;
   } catch (error) {
     console.error('Error al obtener datos:', error);
