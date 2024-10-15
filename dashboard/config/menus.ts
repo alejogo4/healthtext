@@ -11,6 +11,7 @@ import {
   Diez,
   Once,
   Doce,
+  ListFill,
 } from "@/components/svg";
 
 export interface MenuItemProps {
@@ -156,6 +157,22 @@ export const menusConfig = {
                 title: "Listar proveedores",
                 // icon: Envelope,
                 href: "/supplier/list",
+              },
+            ],
+          },
+          {
+            title: "Órden de compra",
+            icon: ListFill,
+            nested: [
+              {
+                title: "Crear",
+          
+                href: "/purchase/purchase-order",
+              },
+              {
+                title: "Listado",
+               
+                href: "/purchase/purchase-list",
               },
             ],
           },

@@ -57,7 +57,7 @@ export interface ContactInfo {
 }
 
 export interface FormType {
-  supplier: string;
+  supplier: { value: string; label: string };
   input_type: { value: string; label: string };
   category?: { value: string; label: string };
   subCategory?: { value: string; label: string };
@@ -67,6 +67,25 @@ export interface FormType {
 const input_type = [
   { value: 'Tela', label: 'Tela' },
   { value: 'Insumo', label: 'Insumo' }
+];
+
+
+export const suppliers: { value: string; label: string }[] = [
+  { value: "SESGOCOLOR", label: "SESGOCOLOR" },
+  { value: "COATS", label: "COATS" },
+  { value: "BOMBAY", label: "BOMBAY" },
+];
+
+export const material: { value: string; label: string }[] = [
+  { value: "SESGOS", label: "SESGOS" },
+  { value: "HILOS", label: "HILOS" },
+  { value: "BOTONES", label: "BOTONES" },
+];
+
+export const colors: { value: string; label: string }[] = [
+  { value: "BLANCO", label: "BLANCO" },
+  { value: "NEGRO", label: "NEGRO" },
+  { value: "AZUL OSCURO - UPB", label: "BOTONES" },
 ];
 
 interface Task {
@@ -126,18 +145,27 @@ const PurchaseOrder: FC<Props> = () => {
           <CardContent>
             <Form {...form}>
               <form onSubmit={handleSubmit(onSubmit)}>
-                <FormField
+                
+                <Controller
                   control={form.control}
                   name='supplier'
-                  render={({ field }) => (
-                    <FormItem>
+                  render={({ field: { onChange, onBlur, value, ref } }) => (
+                    <FormItem className='mt-3'>
                       <FormLabel>Proveedor</FormLabel>
                       <FormControl>
-                        <Input placeholder='Proveedor' {...field} />
+                        <SelectReact
+                          className='react-select'
+                          classNamePrefix='select'
+                          options={suppliers}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
                 />
+
                 <Controller
                   control={form.control}
                   name='input_type'
@@ -229,7 +257,7 @@ const PurchaseOrder: FC<Props> = () => {
                             <SelectReact
                               className='react-select'
                               classNamePrefix='select'
-                              options={input_type}
+                              options={colors}
                               onChange={onChange}
                               onBlur={onBlur}
                               value={value}

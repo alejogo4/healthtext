@@ -1,1 +1,1 @@
-export { default } from '@/views/purchase-order/purchase-order'
+export { default } from '@/views/purchase/purchase-order/purchase-order'
