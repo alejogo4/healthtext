@@ -180,7 +180,6 @@ const ModuleSidebar = ({ trans }: { trans: any }) => {
               </div>
             ))}
           </ScrollArea>
-          <FooterMenu />
         </div>
         {/* end small menu */}
 

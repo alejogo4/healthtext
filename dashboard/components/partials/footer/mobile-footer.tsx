@@ -20,12 +20,6 @@ const MobileFooter = ({ handleOpenSearch }: { handleOpenSearch: () => void }) =>
           </Link>
         </div>
       </div>
-      <div className="flex flex-col items-center justify-center">
-        <ThemeCustomize
-          trigger={<Settings className="h-6 w-6  cursor-pointer" />}
-        />
-        <p className="mb-0 mt-1.5 text-xs text-default-600">Settings</p>
-      </div>
     </footer>
   );
 };

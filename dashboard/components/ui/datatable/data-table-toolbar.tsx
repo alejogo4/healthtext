@@ -16,8 +16,6 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
     const value = event.target.value;
     table.getColumn("title")?.setFilterValue(value);
   };
-  const statusColumn = table.getColumn("status");
-  const priorityColumn = table.getColumn("priority");
 
   return (
     <div className="flex flex-1 flex-wrap items-center gap-2">
@@ -52,7 +50,7 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
           <X className="ltr:ml-2 rtl:mr-2 h-4 w-4" />
         </Button>
       )}
-      <DataTableViewOptions table={table} />
+      {/* <DataTableViewOptions table={table} /> */}
     </div>
 
   );

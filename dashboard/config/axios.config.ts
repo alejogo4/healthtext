@@ -22,8 +22,7 @@ export const api = axios.create({
 export const httpRequest = async <TResponse, TData = undefined>(
   url: string,
   data?: TData,
-  method: AxiosRequestConfig['method'] = 'GET',
-  token?: string
+  method: AxiosRequestConfig['method'] = 'GET'
 ): Promise<TResponse> => {  
 
   const authSession = await fetch(`${authUrl}/api/auth/session`);

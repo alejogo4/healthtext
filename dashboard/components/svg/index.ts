@@ -46,7 +46,6 @@ export { default as UserSign } from "./duel-tone/user-sign.svg";
 export { default as Web } from "./duel-tone/web.svg";
 export { default as Mail2 } from "./duel-tone/mail2.svg";
 export { default as BlankVector } from "./man-vector.svg";
-export { default as DashBoard } from "./duel-tone/dashboard.svg";
 export { default as Application } from "./duel-tone/application.svg";
 export { default as Authentication } from "./duel-tone/authentication.svg";
 export { default as Components } from "./duel-tone/components.svg";
@@ -90,3 +89,18 @@ export { default as Device } from "./duel-tone/device.svg";
 
 // sidebar icon
 export { default as FolderTree } from "./home/foldertree.svg";
+
+
+
+export { default as Uno } from "./menu/1.svg";
+export { default as Dos } from "./menu/2.svg";
+export { default as Tres } from "./menu/3.svg";
+export { default as Cuatro } from "./menu/4.svg";
+export { default as Cinco } from "./menu/5.svg";
+export { default as Seis } from "./menu/6.svg";
+export { default as Siete } from "./menu/7.svg";
+export { default as Ocho } from "./menu/8.svg";
+export { default as Nueve } from "./menu/9.svg";
+export { default as Diez } from "./menu/10.svg";
+export { default as Once } from "./menu/11.svg";
+export { default as Doce } from "./menu/12.svg";

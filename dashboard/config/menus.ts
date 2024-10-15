@@ -1,48 +1,16 @@
 import {
-  Application,
-  Chart,
-  Components,
-  DashBoard,
-  Stacks2,
-  Map,
-  Grid,
-  Files,
-  Graph,
-  ClipBoard,
-  Cart,
-  Envelope,
-  Messages,
-  Monitor,
-  ListFill,
-  Calendar,
-  Flag,
-  Book,
-  Note,
-  ClipBoard2,
-  Note2,
-  Note3,
-  BarLeft,
-  BarTop,
-  ChartBar,
-  PretentionChartLine,
-  PretentionChartLine2,
-  Google,
-  Pointer,
-  Map2,
-  MenuBar,
-  Icons,
-  ChartArea,
-  Building,
-  Building2,
-  Sheild,
-  Error,
-  Diamond,
-  Heroicon,
-  LucideIcon,
-  CustomIcon,
-  Mail,
-  User,
-  UserPlus,
+  Uno,
+  Dos,
+  Tres,
+  Cuatro,
+  Cinco,
+  Seis,
+  Siete,
+  Ocho,
+  Nueve,
+  Diez,
+  Once,
+  Doce,
 } from "@/components/svg";
 
 export interface MenuItemProps {
@@ -60,65 +28,80 @@ export const menusConfig = {
   sidebarNav: {
     modern: [
       {
-        title: "Dashboard",
-        icon: DashBoard,
+        title: "Informes",
+        icon: Uno,
         child: [
-          {
-            title: "Ventas",
-            href: "/dashboard",
-            icon: Graph,
-          },
-          {
-            title: "Compras",
-            href: "/ecommerce",
-            icon: Cart,
-          },
-          {
-            title: "Producción ",
-            href: "/project",
-            icon: ClipBoard,
-          },
+          // {
+          //   title: "Ventas",
+          //   href: "/project",
+          //   icon: Uno,
+          // },
+          // {
+          //   title: "Compras",
+          //   href: "/project",
+          //   icon: Uno,
+          // },
+          // {
+          //   title: "Producción ",
+          //   href: "/project",
+          //   icon: Uno,
+          // },
         ],
       },
       {
-        title: "Proveedores",
-        icon: ListFill,
+        title: "Administrativo",
+        icon: Dos,
         child: [
           {
-            title: "Nuevo proveedor",
-            icon: Components,
-            href: "/supplier/create",
+            title: "Maestros",
+            icon: Dos,
+            nested: [
+              {
+                title: "Tipo de insumos",
+                icon: Dos,
+                href: "/master/general/type",
+              },
+              {
+                title: "Colores",
+                icon: Dos,
+                href: "/master/general/color",
+              },
+              {
+                title: "Linea",
+                icon: Dos,
+                href: "/master/general/linea",
+              },
+
+              {
+                title: "Categoria de insumos",
+                href: "/master/material/category",
+              },
+              {
+                title: "Sub categorias de insumos",
+                href: "/master/material/subcategory",
+              },
+              {
+                title: "Colores de categorias Proveedor",
+                href: "/master/material/colorxsupplier",
+              },
+
+              {
+                title: "Tipo de telas",
+                href: "/master/cloths/type",
+              },
+              {
+                title: "Categorias de telas",
+                href: "/master/cloths/category",
+              },
+              {
+                title: "Colores de telas Proveedor",
+                href: "/master/cloths/colorxsupplier",
+              },
+            ],
           },
-          {
-            title: "Listar proveedores",
-            icon: Envelope,
-            href: "/supplier/list",
-          },
-        ],
-      },
-      {
-        title: "Clientes",
-        icon: User,
-        child: [
-          {
-            title: "Crear cliente",
-            icon: UserPlus,
-            href: "/client/create",
-          },
-          {
-            title: "Listar clientes",
-            icon: ListFill,
-            href: "/client/list",
-          },
-        ],
-      },
-      {
-        title: "Insumos",
-        icon: Grid,
-        child: [
           {
             title: "Insumos",
-            icon: ListFill,
+            icon: Dos,
             nested: [
               {
                 title: "Crear insumos",
@@ -132,7 +115,7 @@ export const menusConfig = {
           },
           {
             title: "Telas",
-            icon: ListFill,
+            icon: Dos,
             nested: [
               {
                 title: "Crear nueva tela",
@@ -147,64 +130,86 @@ export const menusConfig = {
         ],
       },
       {
-        title: "Maestros",
-        icon: Stacks2,
+        title: "Calidad",
+        icon: Tres,
+        child: [],
+      },
+      {
+        title: "Financiero",
+        icon: Cuatro,
+        child: [],
+      },
+      {
+        title: "Compras",
+        icon: Cinco,
         child: [
           {
-            title: "Insumos",
-            icon: Stacks2,
+            title: "Proveedor",
+            icon: Dos,
             nested: [
               {
-                title: "Tipo de insumos",
-                href: "/master/material/type",
+                title: "Nuevo proveedor",
+                // icon: Components,
+                href: "/supplier/create",
               },
               {
-                title: "Categoria de insumos",
-                href: "/master/material/category",
-              },
-              {
-                title: "Sub categorias de insumos",
-                href: "/master/material/subcategory",
+                title: "Listar proveedores",
+                // icon: Envelope,
+                href: "/supplier/list",
               },
             ],
-          },
-          {
-            title: "Telas",
-            icon: Stacks2,
-            nested: [
-              {
-                title: "Tejido",
-                href: "/master/cloths/type",
-              },
-              {
-                title: "Tipo de telas",
-                href: "/master/cloths/category",
-              },
-            ],
-          },
-          {
-            title: "Colores",
-            icon: Stacks2,
-            href: "/master/general/color",
-          },
-          {
-            title: "Presentaciones",
-            icon: Stacks2,
-            href: "/master/general/presentation",
-          },
-
-          {
-            title: "Linea",
-            icon: Stacks2,
-            href: "/master/general/linea",
-          },
-
-          {
-            title: "Unidad de medida",
-            icon: Stacks2,
-            href: "/master/general/unit",
           },
         ],
+      },
+      {
+        title: "Diseño",
+        icon: Seis,
+        child: [],
+      },
+      {
+        title: "Producción",
+        icon: Siete,
+        child: [],
+      },
+      {
+        title: "Comercial",
+        icon: Ocho,
+        child: [
+          {
+            title: "Cliente",
+            icon: Dos,
+            nested: [
+              {
+                title: "Crear cliente",
+                href: "/client/create",
+              },
+              {
+                title: "Listar clientes",
+                href: "/client/list",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Logistica",
+        icon: Nueve,
+        child: [],
+      },
+      {
+        title: "S.S.T Y R.H",
+        icon: Diez,
+        child: [],
+      },
+      {
+        title: "Tecnología",
+        icon: Once,
+        child: [],
+      },
+      {
+        title: "I+I+D",
+        icon: Doce,
+        child: [],
       },
     ],
   },

@@ -1,5 +1,6 @@
 "use client";
 import { Fragment } from "react";
+import Select from "react-select";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 
 import { Input } from "@/components/ui/input";
@@ -10,9 +11,10 @@ import { CardContent, CardHeader, Card, CardTitle } from "@/components/ui/card";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/datatable";
-import { data, labels, priorities, statuses } from "./data";
+import { data, suppliers, statuses, material, colors } from "./data";
 import { DataTableColumnHeader } from "@/components/ui/datatable/data-table-column-header";
 import { DataTableRowActions } from "@/components/ui/datatable/data-table-row-actions";
+
 
 interface Task {
   id: string;
@@ -47,9 +49,37 @@ export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "description",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Nombre" />
+      <DataTableColumnHeader column={column} title="Proveedor color" />
     ),
     cell: ({ row }) => <div>{row.getValue("description")}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+
+  {
+    accessorKey: "color",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Color" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("color")}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "supplier",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Proveedor" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("supplier")}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "material_type",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tipo de material" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("material_type")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
@@ -92,8 +122,10 @@ const BlankPage = () => {
     <div>
       <Breadcrumbs>
         <BreadcrumbItem>Maestros</BreadcrumbItem>
-        <BreadcrumbItem>Insumos</BreadcrumbItem>
-        <BreadcrumbItem className="text-primary">Tipo</BreadcrumbItem>
+        <BreadcrumbItem>Telas</BreadcrumbItem>
+        <BreadcrumbItem className="text-primary">
+          Colores Proveedor
+        </BreadcrumbItem>
       </Breadcrumbs>
       <div className="grid grid-cols-[1fr_2fr] gap-4 mt-5">
         <Card>
@@ -103,7 +135,34 @@ const BlankPage = () => {
           <CardContent>
             <div className="grid gap-4">
               <div className="col-span-2 flex flex-col gap-2">
-                <Label htmlFor="name">Nombre</Label>
+                <Label htmlFor="name">Proveedor</Label>
+                <Select
+                  className="react-select"
+                  classNamePrefix="select"
+                  placeholder="Seleccione un proveedor"
+                  options={suppliers}
+                />
+              </div>
+              <div className="col-span-2 flex flex-col gap-2">
+                <Label htmlFor="name">Categoria de tela</Label>
+                <Select
+                  className="react-select"
+                  classNamePrefix="select"
+                  placeholder="Seleccione un tipo de insumo"
+                  options={material}
+                />
+              </div>
+              <div className="col-span-2 flex flex-col gap-2">
+                <Label htmlFor="name">Color</Label>
+                <Select
+                  className="react-select"
+                  classNamePrefix="select"
+                  placeholder="Seleccione un color"
+                  options={colors}
+                />
+              </div>
+              <div className="col-span-2 flex flex-col gap-2">
+                <Label htmlFor="name">Proveedor color</Label>
                 <Input type="text" id="name" />
               </div>
               <div className="col-span-2">

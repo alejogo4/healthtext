@@ -6,8 +6,7 @@ export const createSupplier = async (body: any) => {
     const data = await httpRequest<ApiResponse<any>>(
       '/supplier',
       body,
-      'POST',
-      fake_token
+      'POST'
     );
     console.log(data);
     return data.data;
@@ -22,8 +21,7 @@ export const listSupplier = async () => {
     const data = await httpRequest<ApiResponse<SupplierCreate[]>>(
       '/supplier',
       undefined,
-      'GET',
-      fake_token
+      'GET'
     );
     console.log(data);
     return data.data;
