@@ -1,0 +1,1 @@
+export { default } from '@/views/purchase-order/purchase-order'
