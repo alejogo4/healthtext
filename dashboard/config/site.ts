@@ -2,7 +2,7 @@
 
 
 export const siteConfig = {
-  name: "DashTail Next js Admin Template",
+  name: "HealthTex | Software de producción",
   description: null,
   theme: "blue",
   layout: "vertical",
