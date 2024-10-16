@@ -1,8 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
-import React, { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 
 import SelectReact from 'react-select';
 
@@ -24,7 +23,6 @@ import { DataTableRowActions } from '@/components/ui/datatable/data-table-row-ac
 import {
   Form,
   FormControl,
-  FormField,
   FormItem,
   FormLabel
 } from '@/components/ui/form';
@@ -36,13 +34,12 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import { mapFormToClientCreate } from '@/views/types/client';
 import { Icon } from '@iconify/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Controller, useForm } from 'react-hook-form';
-import { createClient } from '../client/services/crudClient';
 import { data } from './data';
+import { listCategory, listColor, listLinea, listSupplier, listTypeSupply } from '../services/services';
+import { arrayToReactSelect } from '@/util/arrayToSelect';
 
 type Props = {};
 
@@ -111,6 +108,40 @@ export const columns: ColumnDef<Task>[] = [
 ];
 
 const PurchaseOrder: FC<Props> = () => {
+
+  const [supplierList, setSupplierList]= useState<any[]>([]);
+  const [supplyType, setSupplyType]= useState<any[]>([]);
+  const [categories, setCategories]= useState<any[]>([]);
+  const [subCategories, setSubcategories]= useState<any[]>([]);
+  const [lines, setLines]= useState<any[]>([]);
+  const [colors, setColors]= useState<any[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [supplier, typeSupply] = await Promise.all([
+          listSupplier(),  
+          listTypeSupply()  
+        ]);
+        
+        setSupplierList(supplier);
+        setSupplyType(typeSupply)
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData(); 
+  }, []);
+
+
+
   const onSubmit = async (data: any) => {
     // const response = await createClient(mapFormToClientCreate(data));
     // toast({
@@ -131,6 +162,21 @@ const PurchaseOrder: FC<Props> = () => {
   const { control } = form;
 
   const selectedType = watch('input_type');
+
+  const onChangeTypeSupply = async (selectedOption: { value?: string; label?: string }) => {
+    console.log('La opción seleccionada es:', selectedOption);
+    const categories = await listCategory('SUPPLY');
+    setCategories(categories);
+    const [linea, _colors] = await Promise.all([
+      listLinea(),  
+      listColor()  
+    ]);
+
+    setLines(linea);
+    setColors(_colors);
+
+  };
+  
 
   return (
     <div>
@@ -156,7 +202,7 @@ const PurchaseOrder: FC<Props> = () => {
                         <SelectReact
                           className='react-select'
                           classNamePrefix='select'
-                          options={suppliers}
+                          options={arrayToReactSelect(supplierList)}
                           onChange={onChange}
                           onBlur={onBlur}
                           value={value}
@@ -176,8 +222,11 @@ const PurchaseOrder: FC<Props> = () => {
                         <SelectReact
                           className='react-select'
                           classNamePrefix='select'
-                          options={input_type}
-                          onChange={onChange}
+                          options={arrayToReactSelect(supplyType)}
+                          onChange={(selectedOption) => {
+                            onChangeTypeSupply({label: selectedOption?.label, value: selectedOption?.value})
+                            onChange(selectedOption);
+                          }}
                           onBlur={onBlur}
                           value={value}
                         />
@@ -198,7 +247,7 @@ const PurchaseOrder: FC<Props> = () => {
                             <SelectReact
                               className='react-select'
                               classNamePrefix='select'
-                              options={input_type}
+                              options={arrayToReactSelect(categories)}
                               onChange={onChange}
                               onBlur={onBlur}
                               value={value}
@@ -238,7 +287,7 @@ const PurchaseOrder: FC<Props> = () => {
                             <SelectReact
                               className='react-select'
                               classNamePrefix='select'
-                              options={input_type}
+                              options={arrayToReactSelect(lines)}
                               onChange={onChange}
                               onBlur={onBlur}
                               value={value}
@@ -257,7 +306,7 @@ const PurchaseOrder: FC<Props> = () => {
                             <SelectReact
                               className='react-select'
                               classNamePrefix='select'
-                              options={colors}
+                              options={arrayToReactSelect(colors)}
                               onChange={onChange}
                               onBlur={onBlur}
                               value={value}
