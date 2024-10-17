@@ -19,7 +19,7 @@ export const api = axios.create({
  * @param {string} [token] - Token de autorización para rutas protegidas (opcional).
  * @returns {Promise<TResponse>} - Promesa que se resuelve con la respuesta de la solicitud.
  */
-export const httpRequest = async <TResponse, TData = undefined>(
+export const httpRequest = async <TResponse, TData = any>(
   url: string,
   data?: TData,
   method: AxiosRequestConfig['method'] = 'GET'

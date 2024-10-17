@@ -39,11 +39,9 @@ export const formSchema = z.object({
   url_facebook: z.string().optional(),
   url_twitter: z.string().optional(),
 
-  country: z.string().min(1, 'El país es obligatorio'),
-
-  department: z.string().min(1, 'El departamento es obligatorio'),
-
-  city: z.string().min(1, 'La ciudad es obligatoria'),
+  country: z.any(),
+  department: z.any(),
+  city: z.any(),
 
   neighborhood: z.string().optional(),
 

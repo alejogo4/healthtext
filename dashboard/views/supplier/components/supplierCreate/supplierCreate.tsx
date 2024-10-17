@@ -72,9 +72,9 @@ export interface FormType {
   url_website: string;
   url_facebook: string;
   url_twitter: string;
-  country: string;
-  department: string;
-  city: string;
+  country: { value: string; label: string };
+  department: { value: string; label: string };
+  city: { value: string; label: string };
   neighborhood: string;
   postal_code: string;
   full_address: string;
@@ -113,14 +113,24 @@ import { PersonTypes } from '@/views/services/personType';
 import { Icon } from '@iconify/react';
 import { formSchema } from '../../schema/formCreate';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { CountryTypes } from '@/views/services/countries';
+import { listCities, listStates } from '@/views/services/countries-client';
 
 type Props = {
   documentTypes: DocumentTypes[] | [];
   personTypes: PersonTypes[] | [];
+  countries: CountryTypes[] | [];
 };
 
-const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
+const SupplierCreate: FC<Props> = ({
+  documentTypes,
+  personTypes,
+  countries
+}) => {
   const [activeStep, setActiveStep] = React.useState<number>(0);
+
+  const [departments, setDepartments] = React.useState<any>([]);
+  const [cities, setCities] = React.useState<any[]>([]);
 
   const steps = ['Datos Básicos', 'Dirección', 'Datos Fiscales', 'Contactos'];
   const [documents, setDocuments] = React.useState<
@@ -191,9 +201,9 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
       url_website: '',
       url_facebook: '',
       url_twitter: '',
-      country: '',
-      department: '',
-      city: '',
+      country: { value: '', label: '' },
+      department: { value: '', label: '' },
+      city: { value: '', label: '' },
       neighborhood: '',
       postal_code: '',
       full_address: '',
@@ -274,6 +284,23 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
       reader.onerror = error => reject(error);
     });
   };
+
+  const onChangeCountry = async (selectedOption: { value?: string; label?: string }) => {
+    
+    const states = await listStates(selectedOption?.value ?? '');
+    
+    setDepartments(states);
+
+  };
+
+  const onChangeState = async (selectedOption: { value?: string; label?: string }) => {
+    
+    const cities = await listCities(selectedOption?.value ?? '');
+    setCities(cities);
+
+  };
+
+  
 
   return (
     <div className='mt-4'>
@@ -552,20 +579,28 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                   {activeStep === 1 && (
                     <>
                       <div className='col-span-12 lg:col-span-6'>
-                        <FormField
+                        <Controller
                           control={form.control}
                           name='country'
-                          render={({ field }) => (
+                          render={({
+                            field: { onChange, onBlur, value, ref }
+                          }) => (
                             <FormItem>
                               <FormLabel>País</FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder='País'
-                                  {...field}
-                                  className={cn('', {
-                                    'border-destructive focus:border-destructive':
-                                      form.formState.errors.country
-                                  })}
+                                <SelectReact
+                                  className='react-select'
+                                  classNamePrefix='select'
+                                  options={arrayToReactSelect(countries)}
+                                  onChange={selectedOption => {
+                                    onChangeCountry({
+                                      label: selectedOption?.label,
+                                      value: selectedOption?.value
+                                    });
+                                    onChange(selectedOption);
+                                  }}
+                                  onBlur={onBlur}
+                                  value={value}
                                 />
                               </FormControl>
                             </FormItem>
@@ -574,20 +609,28 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                       </div>
 
                       <div className='col-span-12 lg:col-span-6'>
-                        <FormField
+                        <Controller
                           control={form.control}
                           name='department'
-                          render={({ field }) => (
+                          render={({
+                            field: { onChange, onBlur, value, ref }
+                          }) => (
                             <FormItem>
                               <FormLabel>Departamento</FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder='Departamento'
-                                  {...field}
-                                  className={cn('', {
-                                    'border-destructive focus:border-destructive':
-                                      form.formState.errors.department
-                                  })}
+                                <SelectReact
+                                  className='react-select'
+                                  classNamePrefix='select'
+                                  options={arrayToReactSelect(departments)}
+                                  onChange={selectedOption => {
+                                    onChangeState({
+                                      label: selectedOption?.label,
+                                      value: selectedOption?.value
+                                    });
+                                    onChange(selectedOption);
+                                  }}
+                                  onBlur={onBlur}
+                                  value={value}
                                 />
                               </FormControl>
                             </FormItem>
@@ -596,20 +639,22 @@ const SupplierCreate: FC<Props> = ({ documentTypes, personTypes }) => {
                       </div>
 
                       <div className='col-span-12 lg:col-span-6'>
-                        <FormField
+                        <Controller
                           control={form.control}
                           name='city'
-                          render={({ field }) => (
+                          render={({
+                            field: { onChange, onBlur, value, ref }
+                          }) => (
                             <FormItem>
                               <FormLabel>Ciudad</FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder='Ciudad'
-                                  {...field}
-                                  className={cn('', {
-                                    'border-destructive focus:border-destructive':
-                                      form.formState.errors.city
-                                  })}
+                                <SelectReact
+                                  className='react-select'
+                                  classNamePrefix='select'
+                                  options={arrayToReactSelect(cities)}
+                                  onChange={onChange}
+                                  onBlur={onBlur}
+                                  value={value}
                                 />
                               </FormControl>
                             </FormItem>

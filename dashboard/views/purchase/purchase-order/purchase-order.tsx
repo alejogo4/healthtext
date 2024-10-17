@@ -20,12 +20,7 @@ import { BreadcrumbItem, Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTableColumnHeader } from '@/components/ui/datatable/data-table-column-header';
 import { DataTableRowActions } from '@/components/ui/datatable/data-table-row-actions';
-import {
-  Form,
-  FormControl,
-  FormItem,
-  FormLabel
-} from '@/components/ui/form';
+import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
 import {
   Table,
   TableBody,
@@ -38,7 +33,18 @@ import { Icon } from '@iconify/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Controller, useForm } from 'react-hook-form';
 import { data } from './data';
-import { listCategory, listColor, listLinea, listSupplier, listTypeSupply } from '../services/services';
+import {
+  listCategory,
+  listColor,
+  listColorCloth,
+  listColorSupplier,
+  listLinea,
+  listSubCategory,
+  listSupplier,
+  ListSuppliesI,
+  listTypeSupply,
+  searchSupplies
+} from '../services/services';
 import { arrayToReactSelect } from '@/util/arrayToSelect';
 
 type Props = {};
@@ -55,35 +61,12 @@ export interface ContactInfo {
 
 export interface FormType {
   supplier: { value: string; label: string };
-  input_type: { value: string; label: string };
+  supply_type: { value: string; label: string };
   category?: { value: string; label: string };
   subCategory?: { value: string; label: string };
   line?: { value: string; label: string };
   color?: { value: string; label: string };
 }
-const input_type = [
-  { value: 'Tela', label: 'Tela' },
-  { value: 'Insumo', label: 'Insumo' }
-];
-
-
-export const suppliers: { value: string; label: string }[] = [
-  { value: "SESGOCOLOR", label: "SESGOCOLOR" },
-  { value: "COATS", label: "COATS" },
-  { value: "BOMBAY", label: "BOMBAY" },
-];
-
-export const material: { value: string; label: string }[] = [
-  { value: "SESGOS", label: "SESGOS" },
-  { value: "HILOS", label: "HILOS" },
-  { value: "BOTONES", label: "BOTONES" },
-];
-
-export const colors: { value: string; label: string }[] = [
-  { value: "BLANCO", label: "BLANCO" },
-  { value: "NEGRO", label: "NEGRO" },
-  { value: "AZUL OSCURO - UPB", label: "BOTONES" },
-];
 
 interface Task {
   id: string;
@@ -108,28 +91,30 @@ export const columns: ColumnDef<Task>[] = [
 ];
 
 const PurchaseOrder: FC<Props> = () => {
+  const [supplierList, setSupplierList] = useState<any[]>([]);
+  const [supplyType, setSupplyType] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [subCategories, setSubcategories] = useState<any[]>([]);
+  const [lines, setLines] = useState<any[]>([]);
+  const [colors, setColors] = useState<any[]>([]);
 
-  const [supplierList, setSupplierList]= useState<any[]>([]);
-  const [supplyType, setSupplyType]= useState<any[]>([]);
-  const [categories, setCategories]= useState<any[]>([]);
-  const [subCategories, setSubcategories]= useState<any[]>([]);
-  const [lines, setLines]= useState<any[]>([]);
-  const [colors, setColors]= useState<any[]>([]);
+  const [listSuppliesTable, setListSuppliesTable] = useState<ListSuppliesI[]>([]);
+
+  const [filter, setFilter] = useState<FormType>();
 
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const [supplier, typeSupply] = await Promise.all([
-          listSupplier(),  
-          listTypeSupply()  
+          listSupplier(),
+          listTypeSupply()
         ]);
-        
+
         setSupplierList(supplier);
-        setSupplyType(typeSupply)
+        setSupplyType(typeSupply);
       } catch (err) {
         console.log(err);
       } finally {
@@ -137,16 +122,22 @@ const PurchaseOrder: FC<Props> = () => {
       }
     };
 
-    fetchData(); 
+    fetchData();
   }, []);
 
+  const onSubmit = async (data: FormType) => {
+    console.log(data);
+    setFilter(data);
+    const supplies = await searchSupplies({
+      supplier_id: data.supplier.value,
+      supply_type_id: data.supply_type.value,
+      supply_category_id: data.category?.value || '',
+      supply_subcategory_id: data.subCategory?.value || '',
+      supply_line_id: data.line?.value || '',
+      supply_color_id: data.color?.value || ''
+    });
 
-
-  const onSubmit = async (data: any) => {
-    // const response = await createClient(mapFormToClientCreate(data));
-    // toast({
-    //   title: response?.message
-    // });
+    setListSuppliesTable(supplies);
   };
 
   const form = useForm<FormType>();
@@ -161,22 +152,45 @@ const PurchaseOrder: FC<Props> = () => {
 
   const { control } = form;
 
-  const selectedType = watch('input_type');
+  const supplyTypeW = watch('supply_type');
+  const supplierW = watch('supplier');
 
-  const onChangeTypeSupply = async (selectedOption: { value?: string; label?: string }) => {
-    console.log('La opción seleccionada es:', selectedOption);
-    const categories = await listCategory('SUPPLY');
+  const onChangeTypeSupply = async (selectedOption: {
+    value?: string;
+    label?: string;
+  }) => {
+    let destination = '';
+    if (selectedOption.label?.toLowerCase().includes('tela')) {
+      destination = 'CLOTH';
+    } else {
+      destination = 'SUPPLY';
+    }
+
+    const categories = await listCategory(destination);
+
     setCategories(categories);
-    const [linea, _colors] = await Promise.all([
-      listLinea(),  
-      listColor()  
+    const [linea, subcategory] = await Promise.all([
+      listLinea(),
+      listSubCategory(destination)
     ]);
+
+    let _colors = [];
+    if (destination == 'CLOTH') {
+      _colors = await listColorCloth({
+        suppliers_id: supplierW.value,
+        supply_categories_id: selectedOption.value
+      });
+    } else {
+      _colors = await listColorSupplier({
+        suppliers_id: supplierW.value,
+        supply_types_id: selectedOption.value
+      });
+    }
 
     setLines(linea);
     setColors(_colors);
-
+    setSubcategories(subcategory);
   };
-  
 
   return (
     <div>
@@ -191,7 +205,6 @@ const PurchaseOrder: FC<Props> = () => {
           <CardContent>
             <Form {...form}>
               <form onSubmit={handleSubmit(onSubmit)}>
-                
                 <Controller
                   control={form.control}
                   name='supplier'
@@ -214,7 +227,7 @@ const PurchaseOrder: FC<Props> = () => {
 
                 <Controller
                   control={form.control}
-                  name='input_type'
+                  name='supply_type'
                   render={({ field: { onChange, onBlur, value, ref } }) => (
                     <FormItem className='mt-3'>
                       <FormLabel>Tipo de insumo</FormLabel>
@@ -223,8 +236,11 @@ const PurchaseOrder: FC<Props> = () => {
                           className='react-select'
                           classNamePrefix='select'
                           options={arrayToReactSelect(supplyType)}
-                          onChange={(selectedOption) => {
-                            onChangeTypeSupply({label: selectedOption?.label, value: selectedOption?.value})
+                          onChange={selectedOption => {
+                            onChangeTypeSupply({
+                              label: selectedOption?.label,
+                              value: selectedOption?.value
+                            });
                             onChange(selectedOption);
                           }}
                           onBlur={onBlur}
@@ -235,7 +251,7 @@ const PurchaseOrder: FC<Props> = () => {
                   )}
                 />
 
-                {selectedType?.value && (
+                {supplyTypeW?.value && (
                   <>
                     <Controller
                       control={form.control}
@@ -267,7 +283,7 @@ const PurchaseOrder: FC<Props> = () => {
                             <SelectReact
                               className='react-select'
                               classNamePrefix='select'
-                              options={input_type}
+                              options={arrayToReactSelect(subCategories)}
                               onChange={onChange}
                               onBlur={onBlur}
                               value={value}
@@ -318,11 +334,13 @@ const PurchaseOrder: FC<Props> = () => {
                   </>
                 )}
 
-                <div className='col-span-2 mt-4'>
-                  <Button className='float-right' type='submit'>
-                    Buscar Insumo
-                  </Button>
-                </div>
+                {supplyTypeW?.value && supplierW?.value && (
+                  <div className='col-span-2 mt-4'>
+                    <Button className='float-right' type='submit'>
+                      Buscar Insumo
+                    </Button>
+                  </div>
+                )}
               </form>
             </Form>
           </CardContent>
@@ -333,7 +351,7 @@ const PurchaseOrder: FC<Props> = () => {
               <CardTitle className='text-base'>Insumos encontrados</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
+              {listSuppliesTable.length === 0 ?<p>No existen filtros de búsqueda</p> :<Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className='font-semibold'>Items</TableHead>
@@ -342,9 +360,10 @@ const PurchaseOrder: FC<Props> = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.map(item => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.description}</TableCell>
+                  
+                  {listSuppliesTable.map(item => (
+                    <TableRow key={item.supply_inventory_id}>
+                      <TableCell>{item.supply_type} {item.supply_category} {item.supply_color_supplier}</TableCell>
 
                       <TableCell className='flex justify-end'>
                         <div className='flex gap-3'>
@@ -364,7 +383,7 @@ const PurchaseOrder: FC<Props> = () => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table>}
             </CardContent>
           </Card>
 

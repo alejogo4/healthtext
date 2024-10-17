@@ -35,9 +35,9 @@ export const formSchema = z.object({
     .min(1, 'El nombre es obligatorio')
     .min(2, 'El nombre debe tener al menos 2 caracteres'),
   payment_currency: z.any(),
-  country: z.string().min(1, 'El país es obligatorio'),
-  department: z.string().min(1, 'El departamento es obligatorio'),
-  city: z.string().min(1, 'La ciudad es obligatoria'),
+  country: z.any(),
+  department: z.any(),
+  city: z.any(),
   neighborhood: z.string().optional(),
   postal_code: z.string().regex(/^\d+$/, 'El código postal debe ser numérico'),
   full_address: z.string().min(1, 'La dirección completa es obligatoria'),
