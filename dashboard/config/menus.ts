@@ -170,9 +170,15 @@ export const menusConfig = {
                 href: "/purchase/purchase-order",
               },
               {
-                title: "Listado",
-               
+                title: "Pendientes",             
                 href: "/purchase/purchase-list",
+              },
+              {
+                title: "Aprobadas",             
+                href: "/purchase/purchase-approved",
+              },{
+                title: "Todas",             
+                href: "/purchase/purchase-all",
               },
             ],
           },

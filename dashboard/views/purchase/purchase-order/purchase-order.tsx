@@ -34,6 +34,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Controller, useForm } from 'react-hook-form';
 import { data } from './data';
 import {
+  createSupplyPurchase,
   listCategory,
   listColor,
   listColorCloth,
@@ -43,9 +44,11 @@ import {
   listSupplier,
   ListSuppliesI,
   listTypeSupply,
+  Order,
   searchSupplies
 } from '../services/services';
 import { arrayToReactSelect } from '@/util/arrayToSelect';
+import { toast } from 'react-hot-toast';
 
 type Props = {};
 
@@ -98,7 +101,13 @@ const PurchaseOrder: FC<Props> = () => {
   const [lines, setLines] = useState<any[]>([]);
   const [colors, setColors] = useState<any[]>([]);
 
-  const [listSuppliesTable, setListSuppliesTable] = useState<ListSuppliesI[]>([]);
+  const [listSuppliesTable, setListSuppliesTable] = useState<ListSuppliesI[]>(
+    []
+  );
+
+  const [listSuppliesAdded, setListSuppliesAddedd] = useState<ListSuppliesI[]>(
+    []
+  );
 
   const [filter, setFilter] = useState<FormType>();
 
@@ -126,7 +135,6 @@ const PurchaseOrder: FC<Props> = () => {
   }, []);
 
   const onSubmit = async (data: FormType) => {
-    console.log(data);
     setFilter(data);
     const supplies = await searchSupplies({
       supplier_id: data.supplier.value,
@@ -146,6 +154,7 @@ const PurchaseOrder: FC<Props> = () => {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
     ...formMethods
   } = form;
@@ -190,6 +199,52 @@ const PurchaseOrder: FC<Props> = () => {
     setLines(linea);
     setColors(_colors);
     setSubcategories(subcategory);
+  };
+
+  const onAddItemPurchase = (item: ListSuppliesI) => {
+    const _item = { ...item };
+    _item.quantity = 1;
+    setListSuppliesAddedd([...listSuppliesAdded, _item]);
+  };
+
+  const handleQuantityChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newQuantity = parseInt(e.target.value, 10);
+
+    const updatedItems = listSuppliesAdded.map((item, i) =>
+      i === index ? { ...item, quantity: newQuantity || 0 } : item
+    );
+
+    setListSuppliesAddedd(updatedItems);
+  };
+
+  const handleDelete = (index: number) => {
+    const updatedItems = listSuppliesAdded.filter((_, i) => i !== index);
+
+    setListSuppliesAddedd(updatedItems);
+  };
+
+  const onCreateOrderPurchase = async () => {
+    const order: Order = { supplier_id: 0, items_order: [] };
+    order.supplier_id = parseInt(filter?.supplier?.value || '0');
+    order.items_order = listSuppliesAdded.map(e => {
+      return {
+        supply_inventory_id: e.supply_inventory_id,
+        quantity: e.quantity
+      };
+    });
+    const result = await createSupplyPurchase(order);
+    toast.success('Orden de compra creada correctamente');
+    reset();
+    setListSuppliesAddedd([]);
+    setCategories([]);
+    setSubcategories([]);
+    setLines([]);
+    setColors([]);
+    setListSuppliesTable([]);
+    setFilter(undefined);
   };
 
   return (
@@ -351,39 +406,48 @@ const PurchaseOrder: FC<Props> = () => {
               <CardTitle className='text-base'>Insumos encontrados</CardTitle>
             </CardHeader>
             <CardContent>
-              {listSuppliesTable.length === 0 ?<p>No existen filtros de búsqueda</p> :<Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className='font-semibold'>Items</TableHead>
+              {listSuppliesTable.length === 0 ? (
+                <p>No existen filtros de búsqueda</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className='font-semibold'>Items</TableHead>
 
-                    <TableHead>Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  
-                  {listSuppliesTable.map(item => (
-                    <TableRow key={item.supply_inventory_id}>
-                      <TableCell>{item.supply_type} {item.supply_category} {item.supply_color_supplier}</TableCell>
-
-                      <TableCell className='flex justify-end'>
-                        <div className='flex gap-3'>
-                          <Button
-                            size='icon'
-                            variant='outline'
-                            className=' h-7 w-7'
-                            color='secondary'
-                          >
-                            <Icon
-                              icon='heroicons:plus'
-                              className=' h-4 w-4  '
-                            />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      <TableHead>Acciones</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>}
+                  </TableHeader>
+                  <TableBody>
+                    {listSuppliesTable.map(item => (
+                      <TableRow key={item.supply_inventory_id}>
+                        <TableCell>
+                          {item.supply_type} {item.supply_category}{' '}
+                          {item.supply_subcategory} {item.supply_line}{' '}
+                          {`${item.width}X${item.heigth}`}
+                          {item.supply_color_supplier}
+                        </TableCell>
+
+                        <TableCell className='flex justify-end'>
+                          <div className='flex gap-3'>
+                            <Button
+                              size='icon'
+                              variant='outline'
+                              className=' h-7 w-7'
+                              color='secondary'
+                              onClick={() => onAddItemPurchase(item)}
+                            >
+                              <Icon
+                                icon='heroicons:plus'
+                                className=' h-4 w-4  '
+                              />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
 
@@ -394,66 +458,85 @@ const PurchaseOrder: FC<Props> = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className='font-semibold'>Items</TableHead>
-                    <TableHead className='font-semibold'>Cantidad</TableHead>
-                    <TableHead>Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.map(item => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.description}</TableCell>
-                      <TableCell>
-                        <Input type='number'></Input>
-                      </TableCell>
-                      <TableCell className='flex justify-end'>
-                        <div className='flex gap-3'>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                size='icon'
-                                variant='outline'
-                                className=' h-7 w-7'
-                                color='secondary'
-                              >
-                                <Icon
-                                  icon='heroicons:trash'
-                                  className=' h-4 w-4  '
-                                />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Estas seguro?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Deseas eliminar este item de la orden de
-                                  compra?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel className=' bg-destructive'>
-                                  Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction className='bg-primary'>
-                                  Ok
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
+              {listSuppliesAdded.length === 0 ? (
+                <p>No hay productos agregados a la órden de compra</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className='font-semibold'>Items</TableHead>
+                      <TableHead className='font-semibold'>Cantidad</TableHead>
+                      <TableHead>Acciones</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className='mt-4 flex justify-center'>
-                <Button type='submit'>Crear orden de compra</Button>
-              </div>
+                  </TableHeader>
+                  <TableBody>
+                    {listSuppliesAdded.map((item, index) => (
+                      <TableRow key={item.supply_inventory_id}>
+                        <TableCell>
+                        {item.supply_type} {item.supply_category}{' '}
+                          {item.supply_subcategory} {item.supply_line}{' '}
+                          {`${item.width}X${item.heigth}`}
+                          {item.supply_color_supplier}
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type='number'
+                            onChange={e => handleQuantityChange(index, e)}
+                          />
+                        </TableCell>
+                        <TableCell className='flex justify-end'>
+                          <div className='flex gap-3'>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size='icon'
+                                  variant='outline'
+                                  className=' h-7 w-7'
+                                  color='secondary'
+                                >
+                                  <Icon
+                                    icon='heroicons:trash'
+                                    className=' h-4 w-4  '
+                                  />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Confirmación
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Deseas eliminar este item de la órden de
+                                    compra?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className=' bg-destructive'>
+                                    Cancel
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className='bg-primary'
+                                    onClick={() => handleDelete(index)}
+                                  >
+                                    Ok
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+              {listSuppliesAdded.length > 0 && (
+                <div className='mt-4 flex justify-center'>
+                  <Button type='submit' onClick={onCreateOrderPurchase}>
+                    Crear orden de compra
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

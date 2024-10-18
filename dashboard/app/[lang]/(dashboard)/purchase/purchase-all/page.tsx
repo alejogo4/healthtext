@@ -1,0 +1,1 @@
+export { default } from '@/views/purchase/purchase-all/purchase-list'

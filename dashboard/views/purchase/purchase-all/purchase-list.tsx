@@ -17,56 +17,102 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
 import { Icon } from '@iconify/react';
 import { format } from 'date-fns';
 import {
-  approveOrNotOrder,
+  finishOrder,
+  FinishOrder,
+  FinishOrderItem,
+  getAllPurchases,
   getDetailItems,
   getPurchaseOrder,
   OrderItemDetail,
-  Purchase,
-  PurchaseOrderItem
+  Purchase
 } from '../services/services';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ApiResponse } from '@/config/axios.config';
 
-const PurchaseList = () => {
+const PurchaseApproved = () => {
   const [data, setData] = useState<Purchase[]>([]);
   const [currentItems, setCurrentItems] = useState<OrderItemDetail[]>([]);
-  const [itemToBeApproved, setItemToBeApproved] = useState<{
-    id: string;
-    status: string;
-    observation?: string;
-  }>();
+  const [itemToBeApproved, setItemToBeApproved] = useState<OrderItemDetail[]>(
+    []
+  );
+
+  const [currentPurchase, setCurrentPurchase] = useState<Purchase>();
 
   const [loading, setLoading] = useState(true);
 
   const viewItems = async (purchase: Purchase) => {
-    const _items = await getDetailItems(purchase.id.toString());
-    setCurrentItems(_items);
+    const items = await getDetailItemsLocal(purchase);
+    setCurrentItems(items);
   };
 
-  const onApproveOrNot = async (
-    id: string,
-    status: string,
-    observation?: string
+  const onChekedItems = async (purchase: Purchase) => {
+    const items = await getDetailItemsLocal(purchase);
+    setCurrentPurchase(purchase);
+    setItemToBeApproved(items);
+  };
+
+  const getDetailItemsLocal = async (purchase: Purchase) => {
+    const _items = await getDetailItems(purchase.id.toString());
+    return _items;
+  };
+
+  const handleQuantityChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setItemToBeApproved({ id, status });
-    if (observation) {
-      const orderResult = await approveOrNotOrder(id, status, observation);
-      onCloseModal();
-      getPurchasesList();
-    }
+    const newQuantity = parseInt(e.target.value, 10);
+
+    const updatedItems = itemToBeApproved.map((item, i) =>
+      i === index ? { ...item, quantity: newQuantity } : item
+    );
+
+    setItemToBeApproved(updatedItems);
+  };
+
+  const handlePriceChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = e.target.value.toString();
+
+    const updatedItems = itemToBeApproved.map((item, i) =>
+      i === index ? { ...item, unit_value: newValue } : item
+    );
+
+    setItemToBeApproved(updatedItems as OrderItemDetail[]);
+  };
+
+  const onRecibeItem = (index: number) => {
+    const updatedItems = itemToBeApproved.map((item, i) =>
+      i === index ? { ...item, selected: !item.selected || false } : item
+    );
+
+    setItemToBeApproved(updatedItems);
+  };
+
+  const handleObservations = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = e.target.value;
+
+    const updatedItems = itemToBeApproved.map((item, i) =>
+      i === index ? { ...item, observations: newValue || '' } : item
+    );
+
+    setItemToBeApproved(updatedItems);
   };
 
   const columns: ColumnDef<Purchase>[] = useMemo(() => {
@@ -107,6 +153,23 @@ const PurchaseList = () => {
         enableHiding: false
       },
       {
+        accessorKey: 'date_approved',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Fecha de aprobación' />
+        ),
+        cell: ({ row }) => {
+          const rawDate = row.getValue('date_approved') as string;
+          const formattedDate = format(
+            new Date(rawDate),
+            "dd 'de' MMMM 'de' yyyy",
+            { locale: es }
+          );
+          return <div>{formattedDate}</div>;
+        },
+        enableSorting: false,
+        enableHiding: false
+      },
+      {
         accessorKey: 'purchase_order_items',
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title='Cantidad de insumos' />
@@ -116,6 +179,18 @@ const PurchaseList = () => {
             'purchase_order_items'
           ) as any[];
           return <div>{purchaseOrderItems.length}</div>;
+        },
+        enableSorting: false,
+        enableHiding: false
+      },
+      {
+        accessorKey: 'state',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Estado' />
+        ),
+        cell: ({ row }) => {
+         
+          return <div>{row.getValue('state')}</div>;
         },
         enableSorting: false,
         enableHiding: false
@@ -138,34 +213,6 @@ const PurchaseList = () => {
         ),
         enableSorting: false,
         enableHiding: false
-      },
-      {
-        id: 'action',
-        cell: ({ row }) => {
-          const id = row.getValue('id') as string;
-          return (
-            <div className='flex w-full'>
-              <Button
-                variant='outline'
-                color='secondary'
-                className='mr-2'
-                onClick={() => onApproveOrNot(id, 'APROBADO')}
-              >
-                Aprobar
-              </Button>
-              <Button
-                variant='outline'
-                color='destructive'
-                className='ml-4'
-                onClick={() => onApproveOrNot(id, 'NO APROBADO')}
-              >
-                Rechazar
-              </Button>
-            </div>
-          );
-        },
-        enableSorting: false,
-        enableHiding: false
       }
     ];
   }, []);
@@ -177,7 +224,7 @@ const PurchaseList = () => {
   const getPurchasesList = async () => {
     try {
       setLoading(true);
-      const data = await getPurchaseOrder('ORDEN CREADA');
+      const data = await getAllPurchases();
       setData(data as Purchase[]);
     } catch (err) {
       console.log(err);
@@ -188,8 +235,10 @@ const PurchaseList = () => {
 
   const onCloseModal = () => {
     setCurrentItems([]);
-    setItemToBeApproved(undefined);
+    setItemToBeApproved([]);
+    setCurrentPurchase(undefined);
   };
+
 
   return (
     <div>
@@ -200,7 +249,7 @@ const PurchaseList = () => {
       <div className='w-full mt-4'>
         <Card>
           <CardHeader>
-            <CardTitle>Aprobar/Rechazar Órdenes de Compra</CardTitle>
+            <CardTitle>Ordenes de compra aprobadas</CardTitle>
           </CardHeader>
           <CardContent>
             <DataTable data={data} columns={columns} />
@@ -266,81 +315,9 @@ const PurchaseList = () => {
         </DialogContent>
       </Dialog>
       {/* Modal approved or not */}
-      <AlertDialog open={itemToBeApproved?.id !== undefined}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {itemToBeApproved?.status === 'NO APROBADO'
-                ? 'Rechazar orden de compra'
-                : 'Aprobar orden de compra'}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {itemToBeApproved?.status === 'NO APROBADO'
-                ? '¿Estás seguro de que deseas rechazar este ítem de la orden de compra?'
-                : '¿Estás seguro de que deseas aprobar este ítem de la orden de compra?'}
-
-              <div className='mt-4'>
-                <Label className='mb-2'>Observaciones</Label>
-                <Textarea
-                  placeholder='Observaciones...'
-                  id='observations'
-                  value={itemToBeApproved?.observation}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    if (itemToBeApproved?.id) {
-                      setItemToBeApproved({
-                        ...itemToBeApproved,
-                        observation: e.target.value
-                      });
-                    }
-                  }}
-                  rows={4}
-                />
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              className='bg-destructive'
-              onClick={onCloseModal}
-            >
-              Cancelar
-            </AlertDialogCancel>
-            {/* <AlertDialogAction
-              className={`${
-                itemToBeApproved?.status === 'NO APROBADO'
-                  ? 'bg-secondary'
-                  : 'bg-primary'
-              }`}
-            > */}
-              <Button
-                size='md'
-                variant='outline'
-                className='h-10'
-                color='secondary'
-                onClick={() =>
-                  itemToBeApproved?.status === 'NO APROBADO'
-                    ? onApproveOrNot(
-                        itemToBeApproved.id,
-                        itemToBeApproved.status,
-                        itemToBeApproved.observation ?? 'N/A'
-                      )
-                    : onApproveOrNot(
-                        itemToBeApproved?.id ?? '',
-                        itemToBeApproved?.status ?? '',
-                        itemToBeApproved?.observation ?? 'N/A'
-                      )
-                }
-              >
-                {itemToBeApproved?.status === 'NO APROBADO'
-                  ? 'Rechazar'
-                  : 'Aprobar'}
-              </Button>
-            
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+     
     </div>
   );
 };
 
-export default PurchaseList;
+export default PurchaseApproved;
