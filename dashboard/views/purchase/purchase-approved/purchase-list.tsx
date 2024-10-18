@@ -259,7 +259,7 @@ const PurchaseApproved = () => {
         supply_inventory_id: e.supply_inventory_id,
         quantity:e.quantity,
         unit_value:e.unit_value,
-        observations:e.observations,
+        observations:e.observations ?? '',
         state: e.selected ? 'RECIBIDO' : 'NO RECIBIDO'
       }
     })

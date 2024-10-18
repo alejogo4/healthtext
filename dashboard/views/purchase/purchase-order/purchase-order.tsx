@@ -412,7 +412,7 @@ const PurchaseOrder: FC<Props> = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className='font-semibold'>Items</TableHead>
+                      <TableHead className='font-semibold'>Insumos</TableHead>
 
                       <TableHead>Acciones</TableHead>
                     </TableRow>
@@ -464,7 +464,7 @@ const PurchaseOrder: FC<Props> = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className='font-semibold'>Items</TableHead>
+                      <TableHead className='font-semibold'>Insumos</TableHead>
                       <TableHead className='font-semibold'>Cantidad</TableHead>
                       <TableHead>Acciones</TableHead>
                     </TableRow>
