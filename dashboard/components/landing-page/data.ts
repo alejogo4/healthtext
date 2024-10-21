@@ -2,7 +2,6 @@ import {
   Application,
   Chart,
   Components,
-  DashBoard,
   Stacks2,
   Map,
   Grid,
@@ -86,7 +85,7 @@ import dashboardBlur from "@/public/images/landing-page/dashboard-blur.jpg";
 export const demoMenus = [
   {
     title: "Dashboard",
-    icon: DashBoard,
+    icon: analyticsPage,
     child: [
       {
         title: "Analytics",

@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils";
-import { Application, Authentication, ChartBar, Components, DashBoard, Map } from "@/components/svg";
+import { Application, Authentication, ChartBar, Components, Map } from "@/components/svg";
 
 const Stats = () => {
   const data = [
@@ -9,7 +9,7 @@ const Stats = () => {
       text: "Awesome Dashboards",
       total: "03",
       color: "primary",
-      icon: DashBoard
+      icon: Application
     },
     {
       text: "Ready-made Application",

@@ -25,7 +25,7 @@ export interface MenuItemProps {
   onClick: () => void;
 }
 
-export const menusConfig = {
+export const menusConfig : Record<string, any> = {
   sidebarNav: {
     modern: [
       {

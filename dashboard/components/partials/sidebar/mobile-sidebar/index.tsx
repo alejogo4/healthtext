@@ -90,7 +90,7 @@ const MobileSidebar = ({ className, trans }: { className?: string, trans: any })
               " space-y-2 text-center": collapsed,
             })}
           >
-            {menus.map((item, i) => (
+            {menus.map((item: any, i: number) => (
               <li key={`menu_key_${i}`}>
                 {/* single menu  */}
 

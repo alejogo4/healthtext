@@ -164,7 +164,7 @@ const ModuleSidebar = ({ trans }: { trans: any }) => {
           </div>
           {/* end logo */}
           <ScrollArea className=" pt-6 grow ">
-            {menus.map((item, i) => (
+            {menus.map((item: any, i: number) => (
               <div
                 key={i}
                 onClick={() => toggleSubMenu(i)}

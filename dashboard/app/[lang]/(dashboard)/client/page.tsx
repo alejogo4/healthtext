@@ -1,1 +1,1 @@
-export { default } from '@/views/client/clientCreate'
+export { default } from '@/views/client/clientCreatePage'
