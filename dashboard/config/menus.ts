@@ -82,14 +82,10 @@ export const menusConfig = {
                 href: "/master/material/subcategory",
               },
               {
-                title: "Colores de categorias Proveedor",
+                title: "Colores de insumos Proveedor",
                 href: "/master/material/colorxsupplier",
               },
 
-              {
-                title: "Tipo de telas",
-                href: "/master/cloths/type",
-              },
               {
                 title: "Categorias de telas",
                 href: "/master/cloths/category",

@@ -14,14 +14,14 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
   const isFiltered = table.getState().columnFilters.length > 0;
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    table.getColumn("title")?.setFilterValue(value);
+    // table.getColumn("title")?.setFilterValue(value);
   };
 
   return (
     <div className="flex flex-1 flex-wrap items-center gap-2">
       <Input
         placeholder="Buscar"
-        value={table.getColumn("title")?.getFilterValue() as string || ""}
+        // value={table.getColumn("title")?.getFilterValue() as string || ""}
         onChange={handleFilterChange}
         className="h-8 min-w-[200px] max-w-sm"
       />

@@ -86,59 +86,113 @@ export const listLinea = async () => {
 };
 
 export const createColor = async (body: any) => {
-    try {
-      const data = await httpRequest<ApiResponse<any>>(
-        "/supplycolor",
-        body,
-        "POST"
-      );
-      return data;
-    } catch (error) {
-      console.error("Error al obtener datos:", error);
-      return { message: "Error" };
-    }
-  };
-  
-  export const listColor = async () => {
-    try {
-      const data = await httpRequest<ApiResponse<Master[]>>(
-        `/supplycolor`,
-        undefined,
-        "GET"
-      );
-      return data.data;
-    } catch (error) {
-      console.error("Error al obtener datos:", error);
-      return [];
-    }
-  };
-  
+  try {
+    const data = await httpRequest<ApiResponse<any>>(
+      "/supplycolor",
+      body,
+      "POST"
+    );
+    return data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return { message: "Error" };
+  }
+};
 
-  export const createSubCategory = async (body: any) => {
-    try {
-      const data = await httpRequest<ApiResponse<any>>(
-        "/supplysubcategory",
-        body,
-        "POST"
-      );
-      return data;
-    } catch (error) {
-      console.error("Error al obtener datos:", error);
-      return { message: "Error" };
-    }
-  };
-  
-  export const listSubCategory = async () => {
-    try {
-      const data = await httpRequest<ApiResponse<Master[]>>(
-        `/supplysubcategory`,
-        undefined,
-        "GET"
-      );
-      return data.data;
-    } catch (error) {
-      console.error("Error al obtener datos:", error);
-      return [];
-    }
-  };
-  
+export const listColor = async () => {
+  try {
+    const data = await httpRequest<ApiResponse<Master[]>>(
+      `/supplycolor`,
+      undefined,
+      "GET"
+    );
+    return data.data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return [];
+  }
+};
+
+export const createSubCategory = async (body: any) => {
+  try {
+    const data = await httpRequest<ApiResponse<any>>(
+      "/supplysubcategory",
+      body,
+      "POST"
+    );
+    return data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return { message: "Error" };
+  }
+};
+
+export const listSubCategory = async () => {
+  try {
+    const data = await httpRequest<ApiResponse<Master[]>>(
+      `/supplysubcategory`,
+      undefined,
+      "GET"
+    );
+    return data.data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return [];
+  }
+};
+
+export const createSpplyColorSupplier = async (body: any) => {
+  try {
+    const data = await httpRequest<ApiResponse<any>>(
+      "/supplycolorsupplier",
+      body,
+      "POST"
+    );
+    return data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return { message: "Error" };
+  }
+};
+
+export const listSupplyColorSupplier = async () => {
+  try {
+    const data = await httpRequest<ApiResponse<Master[]>>(
+      `/supplycolorsupplier`,
+      undefined,
+      "GET"
+    );
+    return data.data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return [];
+  }
+};
+
+export const createColorClothSupplier = async (body: any) => {
+  try {
+    const data = await httpRequest<ApiResponse<any>>(
+      "/clothcolorsupplier",
+      body,
+      "POST"
+    );
+    return data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return { message: "Error" };
+  }
+};
+
+export const listColorClothSupplier = async () => {
+  try {
+    const data = await httpRequest<ApiResponse<Master[]>>(
+      `/clothcolorsupplier`,
+      undefined,
+      "GET"
+    );
+    return data.data;
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    return [];
+  }
+};
