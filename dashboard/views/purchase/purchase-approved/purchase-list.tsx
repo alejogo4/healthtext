@@ -306,6 +306,8 @@ const PurchaseApproved = () => {
                   <tr className='bg-gray-100 text-left text-sm uppercase text-gray-600'>
                     <th className='px-4 py-2'>Código</th>
                     <th className='px-4 py-2'>Nombre</th>
+                    <th className='px-4 py-2'>Unidad de medida</th>
+                    <th className='px-4 py-2'>Color Proveedor</th>
                     <th className='px-4 py-2'>Cantidad</th>
                     <th className='px-4 py-2'>Estado</th>
                   </tr>
@@ -323,11 +325,17 @@ const PurchaseApproved = () => {
                         {`${item.width}X${item.heigth} ${item.unit_value}`}
                         {item.supply_color_supplier}
                       </td>
+                      <td className='px-4 py-3'>
+                        {item.supply_unit_of_measure}
+                      </td>
+                      <td className='px-4 py-3'>
+                        {item.supply_color_supplier}
+                      </td>
                       <td className='px-4 py-3'>{item.quantity}</td>
                       <td className='px-4 py-3'>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            item.state === 'approved'
+                            item.state === 'RECIBIDO'
                               ? 'bg-green-100 text-green-700'
                               : item.state === 'rejected'
                               ? 'bg-red-100 text-red-700'
@@ -362,6 +370,9 @@ const PurchaseApproved = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className='font-semibold'>Item</TableHead>
+                    
+                    <TableHead className='font-semibold'>Unidad de medida</TableHead>
+                    <TableHead className='font-semibold'>Color Proveedor</TableHead>
                     <TableHead className='font-semibold'>
                       Valor unitario
                     </TableHead>
@@ -379,8 +390,14 @@ const PurchaseApproved = () => {
                         {item.supply_type} {item.supply_category}{' '}
                         {item.supply_subcategory} {item.supply_line}{' '}
                         {`${item.width}X${item.heigth}`}
-                        {item.supply_color_supplier}
+                        {item.supply_color}
                       </TableCell>
+                      <td className='px-4 py-3'>
+                        {item.supply_unit_of_measure}
+                      </td>
+                      <td className='px-4 py-3'>
+                        {item.supply_color_supplier}
+                      </td>
                       <TableCell>
                         <Input
                           type='number'

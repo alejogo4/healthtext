@@ -202,9 +202,19 @@ const PurchaseOrder: FC<Props> = () => {
   };
 
   const onAddItemPurchase = (item: ListSuppliesI) => {
-    const _item = { ...item };
-    _item.quantity = 1;
-    setListSuppliesAddedd([...listSuppliesAdded, _item]);
+    const existingItemIndex = listSuppliesAdded.findIndex(
+      (supply) => supply.supply_inventory_id === item.supply_inventory_id
+    );
+  
+    if (existingItemIndex !== -1) {
+      const updatedList = [...listSuppliesAdded];
+      console.log(existingItemIndex);
+      updatedList[existingItemIndex].quantity += 1;
+      setListSuppliesAddedd(updatedList);
+    } else {
+      const _item = { ...item, quantity: 1 };
+      setListSuppliesAddedd([...listSuppliesAdded, _item]);
+    }
   };
 
   const handleQuantityChange = (
@@ -413,7 +423,8 @@ const PurchaseOrder: FC<Props> = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className='font-semibold'>Insumos</TableHead>
-
+                      <TableHead className='font-semibold'>Unidad de medida</TableHead>
+                      <TableHead className='font-semibold'>Color Proveedor</TableHead>
                       <TableHead>Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -424,9 +435,10 @@ const PurchaseOrder: FC<Props> = () => {
                           {item.supply_type} {item.supply_category}{' '}
                           {item.supply_subcategory} {item.supply_line}{' '}
                           {`${item.width}X${item.heigth}`}
-                          {item.supply_color_supplier}
+                          {item.supply_color}
                         </TableCell>
-
+                        <TableCell>{item.supply_unit_of_measure}</TableCell>
+                        <TableCell>{item.supply_color_supplier}</TableCell>
                         <TableCell className='flex justify-end'>
                           <div className='flex gap-3'>
                             <Button
@@ -465,6 +477,8 @@ const PurchaseOrder: FC<Props> = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className='font-semibold'>Insumos</TableHead>
+                      <TableHead className='font-semibold'>Unidad de medida</TableHead>
+                      <TableHead className='font-semibold'>Color Proveedor</TableHead>
                       <TableHead className='font-semibold'>Cantidad</TableHead>
                       <TableHead>Acciones</TableHead>
                     </TableRow>
@@ -476,11 +490,14 @@ const PurchaseOrder: FC<Props> = () => {
                         {item.supply_type} {item.supply_category}{' '}
                           {item.supply_subcategory} {item.supply_line}{' '}
                           {`${item.width}X${item.heigth}`}
-                          {item.supply_color_supplier}
+                          {item.supply_color}
                         </TableCell>
+                        <TableCell>{item.supply_unit_of_measure}</TableCell>
+                        <TableCell>{item.supply_color_supplier}</TableCell>
                         <TableCell>
                           <Input
                             type='number'
+                            value={item.quantity}
                             onChange={e => handleQuantityChange(index, e)}
                           />
                         </TableCell>

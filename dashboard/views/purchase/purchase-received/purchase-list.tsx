@@ -20,16 +20,17 @@ import {
 import { Icon } from '@iconify/react';
 import { format } from 'date-fns';
 import {
-  getAllPurchases,
+  downloadPdfOrder,
+  FilePDF,
   getDetailItems,
+  getPurchaseOrder,
   OrderItemDetail,
   Purchase
 } from '../services/services';
 
-const PurchaseApproved = () => {
+const PurchaseReceived = () => {
   const [data, setData] = useState<Purchase[]>([]);
   const [currentItems, setCurrentItems] = useState<OrderItemDetail[]>([]);
-
 
   const [currentPurchase, setCurrentPurchase] = useState<Purchase>();
 
@@ -40,11 +41,35 @@ const PurchaseApproved = () => {
     setCurrentItems(items);
   };
 
+  const onDownload = async (purchase: Purchase) => {
+    const data = await downloadPdfOrder(purchase?.id.toString() ?? '') as FilePDF;
+    if (data?.pdf) {
+      const byteCharacters = atob(data.pdf);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', data.filename);
+      document.body.appendChild(link);
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+    }
+    setCurrentPurchase(purchase);
+  };
+
   const getDetailItemsLocal = async (purchase: Purchase) => {
     const _items = await getDetailItems(purchase.id.toString());
     return _items;
   };
-  
 
   const columns: ColumnDef<Purchase>[] = useMemo(() => {
     return [
@@ -120,7 +145,6 @@ const PurchaseApproved = () => {
           <DataTableColumnHeader column={column} title='Estado' />
         ),
         cell: ({ row }) => {
-         
           return <div>{row.getValue('state')}</div>;
         },
         enableSorting: false,
@@ -144,6 +168,26 @@ const PurchaseApproved = () => {
         ),
         enableSorting: false,
         enableHiding: false
+      },
+      {
+        id: 'action',
+        cell: ({ row }) => {
+          const id = row.getValue('id') as string;
+          return (
+            <div className='flex w-full'>
+              <Button
+                variant='outline'
+                color='secondary'
+                className='mr-2'
+                onClick={() => onDownload(row.original as Purchase)}
+              >
+                Descargar factura
+              </Button>
+            </div>
+          );
+        },
+        enableSorting: false,
+        enableHiding: false
       }
     ];
   }, []);
@@ -155,7 +199,7 @@ const PurchaseApproved = () => {
   const getPurchasesList = async () => {
     try {
       setLoading(true);
-      const data = await getAllPurchases();
+      const data = await getPurchaseOrder('RECIBIDO');
       setData(data as Purchase[]);
     } catch (err) {
       console.log(err);
@@ -169,7 +213,6 @@ const PurchaseApproved = () => {
     setCurrentPurchase(undefined);
   };
 
-
   return (
     <div>
       <Breadcrumbs>
@@ -179,7 +222,7 @@ const PurchaseApproved = () => {
       <div className='w-full mt-4'>
         <Card>
           <CardHeader>
-            <CardTitle>Ordenes de compra aprobadas</CardTitle>
+            <CardTitle>Ordenes de compra recibidas</CardTitle>
           </CardHeader>
           <CardContent>
             <DataTable data={data} columns={columns} />
@@ -245,9 +288,8 @@ const PurchaseApproved = () => {
         </DialogContent>
       </Dialog>
       {/* Modal approved or not */}
-     
     </div>
   );
 };
 
-export default PurchaseApproved;
+export default PurchaseReceived;

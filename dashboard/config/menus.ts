@@ -11,8 +11,8 @@ import {
   Diez,
   Once,
   Doce,
-  ListFill,
-} from "@/components/svg";
+  ListFill
+} from '@/components/svg';
 
 export interface MenuItemProps {
   title: string;
@@ -25,11 +25,11 @@ export interface MenuItemProps {
   onClick: () => void;
 }
 
-export const menusConfig : Record<string, any> = {
+export const menusConfig: Record<string, any> = {
   sidebarNav: {
     modern: [
       {
-        title: "Informes",
+        title: 'Informes',
         icon: Uno,
         child: [
           // {
@@ -47,191 +47,196 @@ export const menusConfig : Record<string, any> = {
           //   href: "/project",
           //   icon: Uno,
           // },
-        ],
+        ]
       },
       {
-        title: "Administrativo",
+        title: 'Administrativo',
         icon: Dos,
         child: [
           {
-            title: "Maestros",
+            title: 'Maestros',
             icon: Dos,
             nested: [
               {
-                title: "Tipo de insumos",
+                title: 'Tipo de insumos',
                 icon: Dos,
-                href: "/master/general/type",
+                href: '/master/general/type'
               },
               {
-                title: "Colores",
+                title: 'Colores',
                 icon: Dos,
-                href: "/master/general/color",
+                href: '/master/general/color'
               },
               {
-                title: "Linea",
+                title: 'Linea',
                 icon: Dos,
-                href: "/master/general/linea",
+                href: '/master/general/linea'
               },
 
               {
-                title: "Categoria de insumos",
-                href: "/master/material/category",
+                title: 'Categoria de insumos',
+                href: '/master/material/category'
               },
               {
-                title: "Sub categorias de insumos",
-                href: "/master/material/subcategory",
+                title: 'Sub categorias de insumos',
+                href: '/master/material/subcategory'
               },
               {
-                title: "Colores de insumos Proveedor",
-                href: "/master/material/colorxsupplier",
+                title: 'Colores de insumos Proveedor',
+                href: '/master/material/colorxsupplier'
               },
 
               {
-                title: "Categorias de telas",
-                href: "/master/cloths/category",
+                title: 'Categorias de telas',
+                href: '/master/cloths/category'
               },
               {
-                title: "Colores de telas Proveedor",
-                href: "/master/cloths/colorxsupplier",
-              },
-            ],
+                title: 'Colores de telas Proveedor',
+                href: '/master/cloths/colorxsupplier'
+              }
+            ]
           },
           {
-            title: "Insumos",
+            title: 'Insumos',
             icon: Dos,
             nested: [
               {
-                title: "Crear insumos",
-                href: "/material/create",
+                title: 'Crear insumos',
+                href: '/material/create'
               },
               {
-                title: "Listar insumos",
-                href: "/material/list",
-              },
-            ],
+                title: 'Listar insumos',
+                href: '/material/list'
+              }
+            ]
           },
           {
-            title: "Telas",
+            title: 'Telas',
             icon: Dos,
             nested: [
               {
-                title: "Crear nueva tela",
-                href: "/cloth/create",
+                title: 'Crear nueva tela',
+                href: '/cloth/create'
               },
               {
-                title: "Listar telas",
-                href: "/cloth/create",
-              },
-            ],
-          },
-        ],
+                title: 'Listar telas',
+                href: '/cloth/create'
+              }
+            ]
+          }
+        ]
       },
       {
-        title: "Calidad",
+        title: 'Calidad',
         icon: Tres,
-        child: [],
+        child: []
       },
       {
-        title: "Financiero",
+        title: 'Financiero',
         icon: Cuatro,
-        child: [],
+        child: []
       },
       {
-        title: "Compras",
+        title: 'Compras',
         icon: Cinco,
         child: [
           {
-            title: "Proveedor",
+            title: 'Proveedor',
             icon: Dos,
             nested: [
               {
-                title: "Nuevo proveedor",
+                title: 'Nuevo proveedor',
                 // icon: Components,
-                href: "/supplier/create",
+                href: '/supplier/create'
               },
               {
-                title: "Listar proveedores",
+                title: 'Listar proveedores',
                 // icon: Envelope,
-                href: "/supplier/list",
-              },
-            ],
+                href: '/supplier/list'
+              }
+            ]
           },
           {
-            title: "Órden de compra",
+            title: 'Órden de compra',
             icon: ListFill,
             nested: [
               {
-                title: "Crear",
-          
-                href: "/purchase/purchase-order",
+                title: 'Crear',
+
+                href: '/purchase/purchase-order'
               },
               {
-                title: "Pendientes",             
-                href: "/purchase/purchase-list",
+                title: 'Pendientes',
+                href: '/purchase/purchase-list'
               },
               {
-                title: "Aprobadas",             
-                href: "/purchase/purchase-approved",
-              },{
-                title: "Todas",             
-                href: "/purchase/purchase-all",
+                title: 'Aprobadas',
+                href: '/purchase/purchase-approved'
               },
-            ],
-          },
-        ],
+              {
+                title: 'Recibidos',
+                href: '/purchase/purchase-received',
+              },
+              {
+                title: 'Todas',
+                href: '/purchase/purchase-all'
+              }
+            ]
+          }
+        ]
       },
       {
-        title: "Diseño",
+        title: 'Diseño',
         icon: Seis,
-        child: [],
+        child: []
       },
       {
-        title: "Producción",
+        title: 'Producción',
         icon: Siete,
-        child: [],
+        child: []
       },
       {
-        title: "Comercial",
+        title: 'Comercial',
         icon: Ocho,
         child: [
           {
-            title: "Cliente",
+            title: 'Cliente',
             icon: Dos,
             nested: [
               {
-                title: "Crear cliente",
-                href: "/client/create",
+                title: 'Crear cliente',
+                href: '/client/create'
               },
               {
-                title: "Listar clientes",
-                href: "/client/list",
-              },
-            ],
-          },
-        ],
+                title: 'Listar clientes',
+                href: '/client/list'
+              }
+            ]
+          }
+        ]
       },
       {
-        title: "Logistica",
+        title: 'Logistica',
         icon: Nueve,
-        child: [],
+        child: []
       },
       {
-        title: "S.S.T Y R.H",
+        title: 'S.S.T Y R.H',
         icon: Diez,
-        child: [],
+        child: []
       },
       {
-        title: "Tecnología",
+        title: 'Tecnología',
         icon: Once,
-        child: [],
+        child: []
       },
       {
-        title: "I+I+D",
+        title: 'I+I+D',
         icon: Doce,
-        child: [],
-      },
-    ],
-  },
+        child: []
+      }
+    ]
+  }
 };
 
 export type ModernNavType = (typeof menusConfig.sidebarNav.modern)[number];

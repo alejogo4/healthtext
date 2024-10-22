@@ -104,6 +104,12 @@ export interface FinishOrderItem {
   state?: string;
 }
 
+
+export interface FilePDF {
+  filename: string;
+  pdf: string;
+}
+
 export const listSupplier = async () => {
   try {
     const data = await httpRequest<ApiResponse<Master[]>>(
@@ -312,6 +318,21 @@ export const finishOrder = async (body: FinishOrder, id: string) => {
       'PUT'
     );
     return data as ApiResponse<any>;
+  } catch (error) {
+    console.error('Error al obtener datos:', error);
+    return [];
+  }
+};
+
+
+export const downloadPdfOrder = async (id: string) => {
+  try {
+    const data = await httpRequest<ApiResponse<FilePDF>>(
+      `/supplierpurchase/pdf/${id}`,
+      undefined,
+      'GET'
+    );
+    return data.data as FilePDF;
   } catch (error) {
     console.error('Error al obtener datos:', error);
     return [];
