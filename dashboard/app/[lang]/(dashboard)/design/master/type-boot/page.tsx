@@ -1,0 +1,1 @@
+export { default } from '@/views/design/master/type-boot/type-boot'

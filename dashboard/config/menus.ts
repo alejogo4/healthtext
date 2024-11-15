@@ -11,7 +11,10 @@ import {
   Diez,
   Once,
   Doce,
-  ListFill
+  ListFill,
+  Grid,
+  List,
+  Components
 } from '@/components/svg';
 
 export interface MenuItemProps {
@@ -175,7 +178,7 @@ export const menusConfig: Record<string, any> = {
               },
               {
                 title: 'Recibidos',
-                href: '/purchase/purchase-received',
+                href: '/purchase/purchase-received'
               },
               {
                 title: 'Todas',
@@ -188,7 +191,58 @@ export const menusConfig: Record<string, any> = {
       {
         title: 'Diseño',
         icon: Seis,
-        child: []
+        child: [
+          {
+            title: 'Base',
+            icon: Grid,
+            nested: [
+              {
+                title: 'Crear base',
+                href: '/design/base/create'
+              },
+              {
+                title: 'Ver base',
+                href: '/design/base/list'
+              },
+              {
+                title: 'Categoría base',
+                href: '/design/base/category-base'
+              }
+            ]
+          },
+          {
+            title: 'Variante',
+            icon: Components,
+            nested: [
+              {
+                title: 'Crear variante',
+                href: '/design/variants/create'
+              },
+              {
+                title: 'Ver variantes',
+                href: '/design/variants/list'
+              }
+            ]
+          },
+          {
+            title: 'Maestros',
+            icon: List,
+            nested: [
+              {
+                title: 'Silueta',
+                href: '/design/master/silhouette'
+              },
+              {
+                title: 'Tipo de bota',
+                href: '/design/master/type-boot'
+              },
+              {
+                title: 'Largo',
+                href: '/design/master/long'
+              }
+            ]
+          }
+        ]
       },
       {
         title: 'Producción',
