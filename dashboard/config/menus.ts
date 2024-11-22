@@ -247,7 +247,18 @@ export const menusConfig: Record<string, any> = {
       {
         title: 'Producción',
         icon: Siete,
-        child: []
+        child: [
+          {
+            title: 'Maestros',
+            icon: List,
+            nested: [
+              {
+                title: 'Valor minuto',
+                href: '/production/master/minute-value'
+              }
+            ]
+          }
+        ]
       },
       {
         title: 'Comercial',

@@ -38,13 +38,27 @@ export const createBase = async (body: any) => {
       body,
       'POST'
     );
-    console.log(data);
-    return data.data;
+    return data;
   } catch (error) {
     console.error('Error al obtener datos:', error);
-    return [];
+    return {status: false, message: 'Error'};
   }
 };
+
+export const deleteBase = async (id: string) => {
+  try {
+    const data = await httpRequest<ApiResponse<any>>(
+      `/pattern-base/${id}`,
+      undefined,
+      'DELETE'
+    );
+    return data;
+  } catch (error) {
+    console.error('Error al obtener datos:', error);
+    return { status: false, message: 'Error al obtener datos' };
+  }
+};
+
 
 export const listBaseClient = async () => {
   try {

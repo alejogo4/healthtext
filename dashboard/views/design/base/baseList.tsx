@@ -7,23 +7,23 @@ import { DataTableRowActions } from '@/components/ui/datatable/data-table-row-ac
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 
-
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import {
-  Dialog,
-  DialogContent
-} from '@/components/ui/dialog';
-import { BaseType, listBase, listBaseClient } from './services/crudBase';
-
+  BaseType,
+  CategoryBases,
+  deleteBase,
+  GenderTypes,
+  listBase,
+  listBaseClient
+} from './services/crudBase';
+import toast from 'react-hot-toast';
 
 const BaseList = () => {
-
   const [data, setData] = useState<BaseType[] | []>([]);
   const [loading, setLoading] = useState(false);
 
   //Supplier
-  const [selectedClient, setSelectedClient] = useState<BaseType | null>(
-    null
-  );
+  const [selectedClient, setSelectedClient] = useState<BaseType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -87,20 +87,26 @@ const BaseList = () => {
       enableHiding: false
     },
     {
-      accessorKey: 'gender_type_id',
+      accessorKey: 'gender_types', // El objeto completo
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Genero' />
+        <DataTableColumnHeader column={column} title='Género' />
       ),
-      cell: ({ row }) => <div>{row.getValue('gender_type_id')}</div>,
+      cell: ({ row }) => {
+        const gender = (row.getValue('gender_types') as GenderTypes)?.name;
+        return <div>{gender || 'Sin género'}</div>;
+      },
       enableSorting: false,
       enableHiding: false
     },
     {
-      accessorKey: 'category_base_id',
+      accessorKey: 'category_bases',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Categoria' />
       ),
-      cell: ({ row }) => <div>{row.getValue('category_base_id')}</div>,
+      cell: ({ row }) => {
+        const gender = (row.getValue('category_bases') as CategoryBases)?.name;
+        return <div>{gender || 'Sin base asociada'}</div>;
+      },
       enableSorting: false,
       enableHiding: false
     },
@@ -109,11 +115,21 @@ const BaseList = () => {
       cell: ({ row }) => (
         <DataTableRowActions
           onPressView={() => onViewData(row.original)}
+          onPressDelete={onDeleteItem}
+          id={row.original.id.toString()}
           row={row}
         />
       )
     }
   ];
+
+  const onDeleteItem = async (id: string) => {
+    let response = await deleteBase(id);
+    if (response?.status) {
+      getData();
+      toast.success(response?.message);
+    }
+  };
 
   return (
     <>

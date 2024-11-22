@@ -10,6 +10,9 @@ import Image from 'next/image';
 import book1 from '@/public/images/all-img/book-1.png';
 import book2 from '@/public/images/all-img/book-2.png';
 import book3 from '@/public/images/all-img/book-3.png';
+import book4 from '@/public/images/all-img/book-4.png';
+import book5 from '@/public/images/all-img/book-5.png';
+import book6 from '@/public/images/all-img/book-6.png';
 
 import { Controller, useForm, useFormContext } from 'react-hook-form';
 
@@ -20,7 +23,7 @@ type Props = {
 const Step1: FC<Props> = ({ bases = [] }) => {
   console.log(bases);
 
-  const images = [{ image: book1 }, { image: book2 }, { image: book3 }];
+  const images = [{ image: book1 }, { image: book2 }, { image: book3 }, { image: book4 }, { image: book5 }, { image: book6 }];
 
   // React Hook Form
   const { control, setValue, watch } = useFormContext();

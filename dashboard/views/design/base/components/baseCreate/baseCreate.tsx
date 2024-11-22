@@ -60,13 +60,16 @@ const BaseCreate: FC<Props> = ({ gender, base_categories = [] }) => {
       category_base_id: data.category_base_id.value,
       gender_type_id: data.gender_type_id.value
     };
+
+    console.log(base_categories);
+    console.log(data);
     let response = await createBase(body);
     if (response?.status) {
       toast.success(response?.message);
-      reset();
     } else {
       toast.error(response?.message);
     }
+    reset();
   };
 
   return (

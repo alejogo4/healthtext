@@ -75,6 +75,18 @@ const CategoryBaseList = ({ categoriesBase }: Props) => {
       enableHiding: false
     },
     {
+      accessorKey: 'code',
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title='Código'
+        />
+      ),
+      cell: ({ row }) => <div>{row.getValue('code')}</div>,
+      enableSorting: false,
+      enableHiding: false
+    },
+    {
       accessorKey: 'packing_photo',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Foto' />
