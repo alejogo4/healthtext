@@ -7,20 +7,20 @@ import { DataTableRowActions } from '@/components/ui/datatable/data-table-row-ac
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 
+
 import {
   Dialog,
   DialogContent
 } from '@/components/ui/dialog';
-import { listClient } from './services/crudVariants';
-import { ClientCreate } from '@/views/types/client';
+import { BaseType, listBase } from './../../services/crudBase';
 
 const BaseList = () => {
 
-  const [data, setData] = useState<ClientCreate[] | []>([]);
+  const [data, setData] = useState<BaseType[] | []>([]);
   const [loading, setLoading] = useState(false);
 
   //Supplier
-  const [selectedClient, setSelectedClient] = useState<ClientCreate | null>(
+  const [selectedClient, setSelectedClient] = useState<BaseType | null>(
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,16 +33,16 @@ const BaseList = () => {
   }, []);
 
   const getData = async () => {
-    const _data = await listClient();
+    const _data = await listBase();
     setData(_data);
   };
 
-  const onViewData = (row: ClientCreate) => {
+  const onViewData = (row: BaseType) => {
     setIsModalOpen(true);
     setSelectedClient(row);
   };
 
-  const columnsdt: ColumnDef<ClientCreate>[] = [
+  const columnsdt: ColumnDef<BaseType>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -124,7 +124,7 @@ const BaseList = () => {
                 </h2>
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-                  <div className='border p-4 rounded-md shadow-md'>
+                  {/* <div className='border p-4 rounded-md shadow-md'>
                     <h3 className='font-semibold text-lg text-gray-700 mb-2'>
                       Información General
                     </h3>
@@ -190,9 +190,9 @@ const BaseList = () => {
                     <p>
                       <strong>Celular:</strong> {selectedClient.cellphone}
                     </p>
-                  </div>
+                  </div> */}
 
-                  <div className='border p-4 rounded-md shadow-md'>
+                  {/* <div className='border p-4 rounded-md shadow-md'>
                     <h3 className='font-semibold text-lg text-gray-700 mb-2'>
                       Contacto
                     </h3>
@@ -222,7 +222,7 @@ const BaseList = () => {
                         </p>
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}

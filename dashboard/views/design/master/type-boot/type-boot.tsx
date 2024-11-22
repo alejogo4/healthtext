@@ -1,42 +1,27 @@
 "use client";
-import { Fragment, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
+import { BreadcrumbItem, Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, Card, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/datatable";
 import { DataTableColumnHeader } from "@/components/ui/datatable/data-table-column-header";
 import { DataTableRowActions } from "@/components/ui/datatable/data-table-row-actions";
+import { ColumnDef } from "@tanstack/react-table";
 
 import { Master } from "@/views/types/master";
 
-import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
-import { createCategory, listCategory } from "@/views/master/services";
+import toast from "react-hot-toast";
+import { createBootType, deleteBootType, listBootType } from "../services/crudBootType";
 
-export const columns: ColumnDef<Master>[] = [
-  {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Nombre" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("name")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
-  },
-];
 
 const schema = z.object({
   name: z.string().min(2),
@@ -47,17 +32,39 @@ const TypeBootPage = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const columns: ColumnDef<Master>[] = [
+    {
+      accessorKey: 'name',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Nombre' />
+      ),
+      cell: ({ row }) => <div>{row.getValue('name')}</div>,
+      enableSorting: false,
+      enableHiding: false
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => (
+        <DataTableRowActions
+          onPressDelete={onDeleteItem}
+          row={row}
+          id={row.original.id}
+        />
+      )
+    }
+  ];
+
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm({
     resolver: zodResolver(schema),
-    mode: "all",
+    mode: 'all',
     defaultValues: {
-      name: "",
-    },
+      name: ''
+    }
   });
 
   useEffect(() => {
@@ -68,23 +75,28 @@ const TypeBootPage = () => {
   }, []);
 
   const getData = async () => {
-    const _data = await listCategory("CLOTH");
+    const _data = await listBootType();
     setData(_data);
     setDataLoading(false);
   };
 
+  const onDeleteItem = async (id: string) => {
+    let response = await deleteBootType(id);
+    if (response?.status) {
+      getData();
+      toast.success(response?.message);
+    }
+  };
+
   const onSubmit = async (data: { name: string }) => {
     setLoading(true);
-    let response: Record<string, any> = await createCategory({
-      ...data,
-      destination: "CLOTH",
-    });
-    if (response["status"]) {
+    let response = await createBootType(data.name);
+    if (response?.status) {
       getData();
-      toast.success(response["message"]);
+      toast.success(response?.message);
       reset();
     } else {
-      toast.error(response["message"]);
+      toast.error(response?.message);
     }
     setLoading(false);
   };
@@ -120,6 +132,7 @@ const TypeBootPage = () => {
                     </div>
                   )}
                 </div>
+                
                 <div className="col-span-2">
                   <Button
                     className="float-right"

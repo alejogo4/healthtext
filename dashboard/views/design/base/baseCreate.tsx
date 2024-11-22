@@ -1,4 +1,5 @@
 import BaseCreate from "./components/baseCreate/baseCreate";
+import { fetchCategoriesBase } from "./services/categoriesBase";
 
 export interface IMetadataProps {
   params?: {};
@@ -10,6 +11,8 @@ export default async function BaseCreatePage({
   searchParams
 }: IMetadataProps) {
 
+  const base_categories = await fetchCategoriesBase()
 
-  return <BaseCreate/>;
+
+  return <BaseCreate base_categories={base_categories}/>;
 }

@@ -1,1 +1,1 @@
-export { default } from '@/views/design/base/baseCreate'
+export { default } from '@/views/design/variants/variantsCreatePage'

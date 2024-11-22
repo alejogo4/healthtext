@@ -1,7 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
 import { FC } from 'react';
 
 import SelectReact from 'react-select';
@@ -16,38 +15,34 @@ import {
 } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
 import { DocumentTypes } from '@/views/services/documentTypes';
-import { PersonTypes } from '@/views/services/personType';
-import { mapFormToClientCreate } from '@/views/types/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { formSchema } from '../../schema/formCreate';
-import { createClient } from '../../services/crudClient';
+import { CategoryBase } from '../../services/categoriesBase';
+import { arrayToReactSelect } from '@/util/arrayToSelect';
+import { createBase } from '../../services/crudBase';
+import toast from 'react-hot-toast';
 
 type Props = {
   gender?: DocumentTypes[] | [];
-  base_categories?: PersonTypes[] | [];
+  base_categories?: CategoryBase[] | [];
 };
 
 export interface FormType {
-  category_id: { value: string; label: string };
-  gender_id: { value: string; label: string };
+  category_base_id: { value: string; label: string };
+  gender_type_id: { value: string; label: string };
   description: string;
   name: string;
 }
 
-const BaseCreate: FC<Props> = ({ gender, base_categories }) => {
-  const onSubmit = async (data: any) => {
-    // toast({
-    //   title: response?.message
-    // });
-  };
-
+const BaseCreate: FC<Props> = ({ gender, base_categories = [] }) => {
   const form = useForm<FormType>({ resolver: zodResolver(formSchema) });
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
     ...formMethods
   } = form;
@@ -59,10 +54,27 @@ const BaseCreate: FC<Props> = ({ gender, base_categories }) => {
     return <p key={key}>{fieldError?.message}</p>;
   });
 
+  const onSubmit = async (data: any) => {
+    const body = {
+      ...data,
+      category_base_id: data.category_base_id.value,
+      gender_type_id: data.gender_type_id.value
+    };
+    let response = await createBase(body);
+    if (response?.status) {
+      toast.success(response?.message);
+      reset();
+    } else {
+      toast.error(response?.message);
+    }
+  };
+
   return (
     <div className='mt-4'>
       <Card className='p-4 mt-8'>
-        <h3 className="text-xl font-medium flex-1 leading-normal mb-8">Crear Base</h3>
+        <h3 className='text-xl font-medium flex-1 leading-normal mb-8'>
+          Crear Base
+        </h3>
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className='grid grid-cols-12 gap-5'>
@@ -90,12 +102,12 @@ const BaseCreate: FC<Props> = ({ gender, base_categories }) => {
               <div className='col-span-12 lg:col-span-6'>
                 <Controller
                   control={form.control}
-                  name='category_id'
+                  name='category_base_id'
                   render={({ field: { onChange, onBlur, value, ref } }) => (
                     <FormItem>
                       <FormLabel
                         className={cn('', {
-                          'text-destructive': form.formState.errors.category_id
+                          'text-destructive': form.formState.errors.category_base_id
                         })}
                       >
                         Seleccionar categoría
@@ -104,11 +116,7 @@ const BaseCreate: FC<Props> = ({ gender, base_categories }) => {
                         <SelectReact
                           className='react-select'
                           classNamePrefix='select'
-                          options={[
-                            { value: 'Conjuntos', label: 'Conjuntos' },
-                            { value: 'Blusas', label: 'Blusas' },
-                            { value: 'Pantalones', label: 'Pantalones' }
-                          ]}
+                          options={arrayToReactSelect(base_categories)}
                           onChange={onChange}
                           onBlur={onBlur}
                           value={value}
@@ -121,12 +129,12 @@ const BaseCreate: FC<Props> = ({ gender, base_categories }) => {
               <div className='col-span-12 lg:col-span-6'>
                 <Controller
                   control={form.control}
-                  name='gender_id'
+                  name='gender_type_id'
                   render={({ field: { onChange, onBlur, value, ref } }) => (
                     <FormItem>
                       <FormLabel
                         className={cn('', {
-                          'text-destructive': form.formState.errors.category_id
+                          'text-destructive': form.formState.errors.gender_type_id
                         })}
                       >
                         Seleccionar género
@@ -136,9 +144,9 @@ const BaseCreate: FC<Props> = ({ gender, base_categories }) => {
                           className='react-select'
                           classNamePrefix='select'
                           options={[
-                            { value: 'Hombre', label: 'Hombre' },
-                            { value: 'Mujer', label: 'Mujer' },
-                            { value: 'Mixto', label: 'Mixto' }
+                            { value: '1', label: 'Hombre' },
+                            { value: '2', label: 'Mujer' },
+                            { value: '3', label: 'Mixto' }
                           ]}
                           onChange={onChange}
                           onBlur={onBlur}

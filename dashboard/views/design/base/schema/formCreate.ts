@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Esquema de validación para el formulario principal
 export const formSchema = z.object({
-  category_id: z
+  category_base_id: z
     .union([
       z.object({
         value: z
@@ -16,7 +16,7 @@ export const formSchema = z.object({
     .refine(val => val !== null && val !== undefined, {
       message: 'La categoría es requerida'
     }),
-  gender_id: z
+  gender_type_id: z
     .union([
       z.object({
         value: z

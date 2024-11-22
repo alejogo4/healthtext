@@ -1,1 +1,1 @@
-export { default } from '@/views/client/clientList'
+export { default } from '@/views/design/base/categoryBase'

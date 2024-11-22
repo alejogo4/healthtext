@@ -21,7 +21,7 @@ import { mapFormToClientCreate } from '@/views/types/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { formSchema } from '../../schema/formCreate';
-import { createClient } from '../../services/crudClient';
+import { createClient } from '../../services/crudBase';
 
 type Props = {
   gender?: DocumentTypes[] | [];

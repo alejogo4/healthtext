@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { Row } from '@tanstack/react-table';
+import { MoreHorizontal } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,33 +11,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 interface DataTableRowActionsProps {
   row: Row<any>;
-  onPressEdit?:()=>void;
-  onPressView?:()=>void;
+  onPressEdit?: () => void;
+  onPressView?: () => void;
+  onPressDelete?: (id: string) => void;
+  id?: string;
 }
 
-export function DataTableRowActions({ row,onPressEdit,onPressView }: DataTableRowActionsProps) {
+export function DataTableRowActions({
+  row,
+  onPressEdit,
+  onPressView,
+  onPressDelete,
+  id=''
+}: DataTableRowActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+          variant='ghost'
+          className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'
         >
-          <MoreHorizontal className="h-4 w-4" />
-          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className='h-4 w-4' />
+          <span className='sr-only'>Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem onClick={onPressEdit}>Editar</DropdownMenuItem>
         <DropdownMenuItem onClick={onPressView}>Ver</DropdownMenuItem>
         {/* <DropdownMenuItem>Favorite</DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onPressDelete && onPressDelete(id)}>
           Eliminar
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
