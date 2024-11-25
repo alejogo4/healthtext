@@ -1,64 +1,96 @@
 'use client';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { Controller, useFormContext } from 'react-hook-form';
-
+import SelectReact from 'react-select';
 import {
   getBoot,
   getLenght,
+  getLines,
   getSilhouette,
   getSizeCategory
 } from '../../../services/crudVariants';
 import { BaseType } from '@/views/design/base/services/crudBase';
 import { Master } from '@/views/types/master';
+import { FormControl, FormItem, FormLabel } from '@/components/ui/form';
+import { arrayToReactSelect } from '@/util/arrayToSelect';
 
 type Props = {
   bases: BaseType[] | [];
 };
 
 const Step2: FC<Props> = ({ bases = [] }) => {
-  const [typeConfig, setTypeConfig] = useState<Master[]>([]);
-  const [typeSize, setTypeSize] = useState<Master[]>([]);
-  const [typeLenght, setTypeLenght] = useState<Master[]>([]);
-  const [titleConfig, setTitleConfig] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-
   // React Hook Form
   const { control, setValue, watch } = useFormContext();
 
-  const type_base_id = watch('type_base_id');
-  const type_base = watch('type_base');
+  const [typeConfig, setTypeConfig] = useState<Master[]>([]);
+  const [typeSize, setTypeSize] = useState<Master[]>([]);
+  const [typeLenght, setTypeLenght] = useState<Master[]>([]);
+  const [lines, setLines] = useState<Master[]>([]);
+  const [titleConfig, setTitleConfig] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const hasFetched = useRef(false);
+
+  const category_base_id = watch('category_base_id');
+  const category_bases_code = watch('category_bases_code');
 
   useEffect(() => {
-    if (type_base && type_base_id) {
+    if (!hasFetched.current && category_bases_code && category_base_id) {
       fetchData();
+      fetchLines();
+      hasFetched.current = true;
     }
-  }, [type_base, type_base_id]);
+  }, [category_bases_code, category_base_id]);
 
   const fetchData = async () => {
     setIsLoading(true);
+    const length = await getLenght(category_base_id);
+    const size = await getSizeCategory(category_base_id);
     try {
-      if (type_base === 'T') {
+      if (category_bases_code === 'B') {
         const config = await getSilhouette();
-        const length = await getLenght();
+
         setValue(
-          'typeConf',
+          'typeConfig',
           config.map(item => ({ ...item, selected: true }))
         );
-        setTypeLenght(length);
+
         setTypeConfig(config);
         setTitleConfig('Seleccionar Siluetas');
-      } else if (type_base === 'P') {
+      } else if (category_bases_code === 'P') {
         const config = await getBoot();
-        const length = await getLenght();
-        setTypeLenght(length);
+        //const length = await getLenght(category_base_id);
         setTypeConfig(config);
         setTitleConfig('Seleccionar Bota');
+        setValue(
+          'typeConfig',
+          config.map(item => ({ ...item, selected: true }))
+        );
       }
 
-      const size = await getSizeCategory(type_base_id);
+      setTypeLenght(length);
+      setValue(
+        'typeLenght',
+        length.map(item => ({ ...item, selected: true }))
+      );
+
       setTypeSize(size);
+      setValue(
+        'typeSize',
+        size.map(item => ({ ...item, selected: true }))
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchLines = async () => {
+    setIsLoading(true);
+    try {
+      const lines = await getLines();
+      setLines(lines);
     } finally {
       setIsLoading(false);
     }
@@ -74,9 +106,28 @@ const Step2: FC<Props> = ({ bases = [] }) => {
         Configuración variante
       </h3>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      <Controller
+        control={control}
+        name='line_id'
+        render={({ field: { onChange, onBlur, value, ref } }) => (
+          <FormItem>
+            <FormLabel>Seleccionar linea</FormLabel>
+            <FormControl>
+              <SelectReact
+                className='react-select'
+                classNamePrefix='select'
+                options={arrayToReactSelect(lines)}
+                onChange={onChange}
+                onBlur={onBlur}
+                value={value}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
         <div className='w-full'>
-          <h5 className='text-lg font-medium text-default-800 mb-5'>
+          <h5 className='text-base font-medium text-default-800 mb-2'>
             {titleConfig}
           </h5>
           <div className='flex flex-col gap-2 flex-wrap'>
@@ -85,7 +136,9 @@ const Step2: FC<Props> = ({ bases = [] }) => {
                 <div
                   key={type.id}
                   className={cn('flex flex-col gap-2', {
-                    'border-primary border rounded-md': watch(`typeConfig.${index}.selected`)
+                    'border-primary border rounded-md': watch(
+                      `typeConfig.${index}.selected`
+                    )
                   })}
                 >
                   {/* Control para Selección */}
@@ -156,7 +209,7 @@ const Step2: FC<Props> = ({ bases = [] }) => {
           </div>
         </div>
         <div className='w-full'>
-          <h5 className='text-lg font-medium text-default-800 mb-5'>
+          <h5 className='text-base font-medium text-default-800 mb-2'>
             Seleccionar largo
           </h5>
           <div className='flex flex-col gap-2 flex-wrap'>
@@ -194,15 +247,15 @@ const Step2: FC<Props> = ({ bases = [] }) => {
           </div>
         </div>
       </div>
-      <div className='w-full'>
-        <h5 className='text-lg font-medium text-default-800 mb-5'>
-          {titleConfig}
+      <div className='w-full my-6'>
+        <h5 className='text-base font-medium text-default-800 mb-2'>
+          Seleccionar tallas
         </h5>
         <div className='flex flex-col gap-2 flex-wrap'>
-          {typeConfig.map((typeConf, index) => (
+          {typeSize.map((typeSize, index) => (
             <Controller
-              key={typeConf.id}
-              name={`typeConf.${index}.selected`}
+              key={typeSize.id}
+              name={`typeSize.${index}.selected`}
               control={control}
               render={({ field }) => (
                 <div
@@ -223,7 +276,7 @@ const Step2: FC<Props> = ({ bases = [] }) => {
                         'text-primary': field.value
                       })}
                     >
-                      {typeConf.name}
+                      {typeSize.name}
                     </span>
                   </label>
                 </div>

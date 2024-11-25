@@ -21,14 +21,12 @@ type Props = {
 };
 
 const Step1: FC<Props> = ({ bases = [] }) => {
-  console.log(bases);
 
   const images = [{ image: book1 }, { image: book2 }, { image: book3 }, { image: book4 }, { image: book5 }, { image: book6 }];
 
   // React Hook Form
   const { control, setValue, watch } = useFormContext();
 
-  // Obtener el id seleccionado para controlar estilos dinámicamente
   const base_id = watch('base_id');
 
   return (
@@ -62,8 +60,8 @@ const Step1: FC<Props> = ({ bases = [] }) => {
                   onChange={e => {
                     field.onChange(e.target.value);
                     setValue('base_id', e.target.value);
-                    setValue('type_base', option.category_bases.code);
-                    setValue('type_base_id', option.category_base_id);
+                    setValue('category_bases_code', option.category_bases.code);
+                    setValue('category_base_id', option.category_base_id);
                   }}
                 />
               )}

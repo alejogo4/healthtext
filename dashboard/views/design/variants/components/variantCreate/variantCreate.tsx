@@ -3,28 +3,22 @@ import { Button } from '@/components/ui/button';
 import { Step, StepLabel, Stepper } from '@/components/ui/steps';
 import React, { FC } from 'react';
 
-
 import { Card } from '@/components/ui/card';
-import {
-  Form
-} from '@/components/ui/form';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 import { BaseType } from '@/views/design/base/services/crudBase';
-import { CountryTypes } from '@/views/services/countries';
-import { DocumentTypes } from '@/views/services/documentTypes';
-import { PersonTypes } from '@/views/services/personType';
 import { faker } from '@faker-js/faker';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { formSchema } from '../../schema/formCreate';
+import { EmbroideryRequest, saveBaseVariant, saveEmbroidery, VariantPayload } from '../../services/crudVariants';
 import Step1 from '../components/step1/step1';
 import Step2 from '../components/step2/step2';
+import Step3 from '../components/step3/step3';
+import Step4 from '../components/step4/step4';
+import Step5 from '../components/step5/step5';
 
 type Props = {
-  documentTypes: DocumentTypes[] | [];
-  personTypes: PersonTypes[] | [];
-  countries: CountryTypes[] | [];
   bases: BaseType[] | [];
 };
 
@@ -39,8 +33,15 @@ export interface ContactInfo {
 }
 
 export interface FormType {
-  base_id: number;
-  type_base: string;
+  base_id: string;
+  category_bases_code: string;
+  category_base_id: string;
+  line_id: { value: string; label: string };
+  typeLenght: any;
+  typeConfig: any;
+  typeSize: any;
+  embroideries: any;
+  variant_id?: number;
   // document_type_id: { value: string; label: string };
   // document_number: string;
   // name: string;
@@ -60,36 +61,16 @@ export interface FormType {
   // contact_info: ContactInfo[];
 }
 
-const way_to_meet_them = [
-  { value: 'social_media', label: 'Redes Sociales' },
-  { value: 'recommendation', label: 'Recomendación' },
-  { value: 'advertising', label: 'Publicidad' },
-  { value: 'direct_contact', label: 'Contacto Directo' }
-];
-
-
-const VariantCreate: FC<Props> = ({ documentTypes, personTypes, countries, bases =[] }) => {
+const VariantCreate: FC<Props> = ({ bases = [] }) => {
   const [activeStep, setActiveStep] = React.useState<number>(0);
-  const [departments, setDepartments] = React.useState<any>([]);
-  const [cities, setCities] = React.useState<any[]>([]);
 
-  const steps = ['Seleccionar Base', 'Configurar Variantes', 'Bordado', 'Archivos' , 'Medidas'];
-
-  const isStepOptional = (step: number) => {
-    return step === 1;
-  };
-
-  const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
+  const steps = [
+    'Seleccionar Base',
+    'Configurar Variantes',
+    'Bordado',
+    'Archivos',
+    'Medidas'
+  ];
 
   const onSubmit = async (data: any) => {
     console.log(data);
@@ -107,23 +88,102 @@ const VariantCreate: FC<Props> = ({ documentTypes, personTypes, countries, bases
     register,
     handleSubmit,
     watch,
+    getValues,
+    setValue,
     formState: { errors },
     ...formMethods
   } = form;
+
+  const base_id = watch('base_id');
+  const line_id = watch('line_id');
+  const typeLenght = watch('typeLenght');
+  const typeConfig = watch('typeConfig');
+  const typeSize = watch('typeSize');
+  const category_bases_code = watch('category_bases_code');
+  const embroideries = watch('embroideries');
+  const variant_id = watch('variant_id');
 
   // const typePerson = watch('document_type_id');
   // const accept_information = watch('authorizes_receive_information');
 
   const { control } = form;
 
+  const isStepOptional = (step: number) => {
+    return step === 1;
+  };
+
+  const getConfigVariant = (type: string) => {
+    if (category_bases_code === type) {
+      if (category_bases_code == 'B') {
+        return typeConfig
+          .filter((e: any) => e.selected)
+          .map((e: any) => {
+            return {
+              silhouette_id: e.id,
+              has_zipper: e.hasZipper ?? false
+            };
+          });
+      } else {
+        return typeConfig
+          .filter((e: any) => e.selected)
+          .map((e: any) => {
+            return {
+              boot_type_id: e.id,
+              has_zipper: e.hasZipper ?? false
+            };
+          });
+      }
+    } else {
+      return [];
+    }
+  };
+
+  const handleNext = async () => {
+    if (activeStep === 1) {
+      const body: VariantPayload = {
+        pattern_base_id: parseInt(base_id),
+        silhouette: getConfigVariant('B'),
+        boot_type: getConfigVariant('P'),
+        size_ids:
+          typeSize.filter((e: any) => e.selected).map((e: any) => e.id) ?? [],
+        length_ids:
+          typeLenght.filter((e: any) => e.selected).map((e: any) => e.id) ?? [],
+        supply_line_id: parseInt(line_id.value)
+      };
+
+      const response = await saveBaseVariant(body);
+      if(response){
+        setValue('variant_id', response?.id ?? 0);
+      }
+
+    }
+    if(activeStep === 2){
+      const body:EmbroideryRequest = {
+        embroidery_variant: embroideries.filter((e:any)=>e.selected).map((e:any)=>{
+          return{
+            embroidery_id:e.id,
+            garment_variant_id: variant_id,
+            description: e.description
+          }
+        })
+      }
+      const response = saveEmbroidery(body);
+    }
+    setActiveStep(prevActiveStep => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep(prevActiveStep => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
 
   const errorMessages = Object.keys(errors).map(key => {
     const fieldError = errors[key as keyof typeof errors];
-    return <p key={key}>{fieldError?.message}</p>;
+    return <p key={key}>{fieldError?.message?.toString()}</p>;
   });
-
-
- 
 
   return (
     <div className='mt-4'>
@@ -176,15 +236,11 @@ const VariantCreate: FC<Props> = ({ documentTypes, personTypes, countries, bases
             <FormProvider {...form}>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className='w-full'>
-                  {activeStep === 0 && (
-                    <Step1 bases={bases}/>
-                  )}
-                  {activeStep === 1 && (
-                    <Step2 bases={bases}/>
-                  )}
-                  {activeStep === 2 && (
-                   <p>Hola</p>
-                  )}
+                  {activeStep === 0 && <Step1 bases={bases} />}
+                  {activeStep === 1 && <Step2 bases={bases} />}
+                  {activeStep === 2 && <Step3 />}
+                  {activeStep === 3 && <Step4 />}
+                  {activeStep === 4 && <Step5 />}
                 </div>
                 <div>
                   {errorMessages.length > 0 && (

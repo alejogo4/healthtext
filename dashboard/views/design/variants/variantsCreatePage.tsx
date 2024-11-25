@@ -15,7 +15,7 @@ export default async function BaseCreatePage({
 
   return (
     <VariantsProvider>
-      <VariantCreate documentTypes={[]} personTypes={[]} countries={[]} bases={bases} />
+      <VariantCreate bases={bases} />
     </VariantsProvider>
   );
 }
