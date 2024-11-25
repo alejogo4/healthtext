@@ -14,6 +14,7 @@ declare module 'next-auth/jwt' {
     accessToken?: string;
     tokenType?: string;
     expiresIn?: number;
+    additionalInfo?: Record<string, any>;
   }
 }
 
@@ -22,5 +23,6 @@ declare module 'next-auth' {
     accessToken?: string;
     tokenType?: string;
     expiresIn?: number;
+    additionalInfo?: Record<string, any>;
   }
 }

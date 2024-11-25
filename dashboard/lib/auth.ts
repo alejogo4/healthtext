@@ -1,4 +1,4 @@
-import { loginService } from '@/services/login';
+import { getProfile, loginService } from '@/services/login';
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
@@ -51,6 +51,11 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = user.accessToken;
         token.tokenType = user.tokenType;
         token.expiresIn = user.expiresIn;
+        console.log(user.accessToken)
+        const profile = await getProfile(user.accessToken ?? '');
+        console.log(profile)
+        token.additionalInfo = profile ?? undefined; 
+
       }
       return token;
     },
@@ -58,6 +63,10 @@ export const authOptions: NextAuthOptions = {
       session.accessToken = token.accessToken;
       session.tokenType = token.tokenType;
       session.expiresIn = token.expiresIn;
+
+      if (token?.additionalInfo) {
+        session.additionalInfo = token.additionalInfo;
+      }
 
       return session;
     }
