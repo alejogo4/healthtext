@@ -6,5 +6,10 @@ const convertFileToBase64 = (file: File): Promise<string> =>
     reader.readAsDataURL(file);
   });
 
+function removeFileExtension(filename: string): string {
+  // Encuentra la última posición del punto y corta el nombre hasta ahí
+  const lastDotIndex = filename.lastIndexOf('.');
+  return lastDotIndex !== -1 ? filename.slice(0, lastDotIndex) : filename;
+}
 
-  export {convertFileToBase64};
+export { convertFileToBase64, removeFileExtension };

@@ -11,7 +11,7 @@ const FILES = [
   },
   {
     name: 'exploded_drawing',
-    title: 'Dibujo técnico'
+    title: 'Dibujo despiece'
   },
   {
     name: 'specific_drawing',
@@ -26,7 +26,9 @@ const Step4: FC = () => {
 
   const hasFetched = useRef(false);
 
-  const type_config = getValues('typeConfig');
+  const typeConfigServices = getValues('typeConfigServices');
+
+  const type_config = typeConfigServices.silhouettes;
 
   if (isLoading) {
     return <p>Cargando datos...</p>;
@@ -34,25 +36,29 @@ const Step4: FC = () => {
 
   return (
     <div className='mt-4'>
-      <h3 className='text-xl font-medium text-default-800 mb-5'>Bordados</h3>
+      <h3 className='text-xl font-medium text-default-800 mb-5'>Cargar archivos</h3>
 
       <div className='w-full'>
-        <h5 className='text-base font-medium text-default-800 mb-2'>
-          Cargar archivos
-        </h5>
         <div className='w-full'>
+          <div className='flex flex-col my-4'>
+            <Label className='mb-1' htmlFor={`mold_file`}>
+              Molde
+            </Label>
+            <Input
+              type='file'
+              {...register(`mold_file`)}
+              className='border rounded p-1'
+            />
+          </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-            {type_config.map((config: any, index: number) => {
-              if(!config.selected){
-                return;
-              }
+            {type_config && type_config.map((config: any, index: number) => {
               return (
                 <div
                   key={config.id}
                   className='border-primary border p-4 w-full rounded-md space-y-2'
                 >
                   <h3 className='font-semibold text-primary text-base mb-4'>
-                    Archivos: {config.name}
+                    Archivos: {config.silhouettes.name}
                   </h3>
 
                   {/* Iterar sobre los 3 campos de archivo */}
@@ -60,14 +66,14 @@ const Step4: FC = () => {
                     <div key={fileIndex} className='flex flex-col mt-4'>
                       <Label
                         className='text-primary-500 mb-1'
-                        htmlFor={`typeConfig.${index}.files.${fileIndex}`}
+                        htmlFor={`typeConfigServices.silhouettes.${index}.files.${fileIndex}`}
                       >
                         Archivo {data.title}
                       </Label>
                       <Input
                         type='file'
-                        id={`typeConfig.${index}.files.${fileIndex}`}
-                        {...register(`typeConfig.${index}.files.${fileIndex}`)}
+                        id={`typeConfigServices.silhouettes.${index}.files.${fileIndex}`}
+                        {...register(`typeConfigServices.silhouettes.${index}.files.${fileIndex}`)}
                         className='border rounded p-1'
                       />
                     </div>

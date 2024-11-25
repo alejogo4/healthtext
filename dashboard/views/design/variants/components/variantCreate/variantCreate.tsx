@@ -11,12 +11,28 @@ import { faker } from '@faker-js/faker';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { formSchema } from '../../schema/formCreate';
-import { EmbroideryRequest, saveBaseVariant, saveEmbroidery, VariantPayload } from '../../services/crudVariants';
+import {
+  EmbroideryRequest,
+  MeasurementRequest,
+  MoldAttachmentVariantRequest,
+  saveBaseVariant,
+  saveDrawSilhouette,
+  saveEmbroidery,
+  saveFilesVariant,
+  saveMeasurement,
+  SilhouetteAttachment,
+  SilhouetteDrawRequest,
+  SilhouetteVariant,
+  VariantPayload,
+  VariantResponse
+} from '../../services/crudVariants';
 import Step1 from '../components/step1/step1';
 import Step2 from '../components/step2/step2';
 import Step3 from '../components/step3/step3';
 import Step4 from '../components/step4/step4';
 import Step5 from '../components/step5/step5';
+import { convertFileToBase64, removeFileExtension } from '@/util/file';
+import { toast } from '@/components/ui/use-toast';
 
 type Props = {
   bases: BaseType[] | [];
@@ -39,9 +55,11 @@ export interface FormType {
   line_id: { value: string; label: string };
   typeLenght: any;
   typeConfig: any;
+  typeConfigServices: any;
   typeSize: any;
   embroideries: any;
   variant_id?: number;
+  mold_file: any;
   // document_type_id: { value: string; label: string };
   // document_number: string;
   // name: string;
@@ -61,6 +79,22 @@ export interface FormType {
   // contact_info: ContactInfo[];
 }
 
+function mapToMeasurementRequest(data: any): MeasurementRequest {
+  return {
+    sizes: data.map((item: any) => {
+      return item.sizes.map((size: any) => ({
+        silhouettes_variant_id: item.garment_variant_id,
+        size_id: size.size_id,
+        measurement_categories: size.categories.map((category: any) => ({
+          measurement_category_id: category.id,
+          value: parseFloat(category.value),
+        })),
+      }));
+    }).flat(),
+    lengths: [],
+  };
+}
+
 const VariantCreate: FC<Props> = ({ bases = [] }) => {
   const [activeStep, setActiveStep] = React.useState<number>(0);
 
@@ -73,16 +107,22 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
   ];
 
   const onSubmit = async (data: any) => {
+
     console.log(data);
-    // const response = await createClient(mapFormToClientCreate(data));
-    // handleNext();
-    // toast({
-    //   title: response?.message
-    // });
+    const silhouettes = typeConfigServices.silhouettes;
+
+    const body: MeasurementRequest = mapToMeasurementRequest(silhouettes);
+    console.log(body);
+    const response = await saveMeasurement(body);
+    reset();
+    handleNext();
+    toast({
+      title: response?.message
+    });
   };
   const isTablet = useMediaQuery('(max-width: 1024px)');
 
-  const form = useForm<FormType>({ resolver: zodResolver(formSchema) });
+  const form = useForm<FormType>({});
 
   const {
     register,
@@ -90,6 +130,7 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
     watch,
     getValues,
     setValue,
+    reset,
     formState: { errors },
     ...formMethods
   } = form;
@@ -98,10 +139,12 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
   const line_id = watch('line_id');
   const typeLenght = watch('typeLenght');
   const typeConfig = watch('typeConfig');
+  const typeConfigServices = watch('typeConfigServices');
   const typeSize = watch('typeSize');
   const category_bases_code = watch('category_bases_code');
   const embroideries = watch('embroideries');
   const variant_id = watch('variant_id');
+  const mold_file = watch('mold_file');
 
   // const typePerson = watch('document_type_id');
   // const accept_information = watch('authorizes_receive_information');
@@ -138,6 +181,92 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
     }
   };
 
+  const proccessFile = async (array: any[]) => {
+    if (!array || array.length === 0) {
+      console.error('No file provided.');
+      return;
+    }
+
+    const file = array[0];
+    const base64 = await convertFileToBase64(file);
+
+    // Extraemos el nombre y extensión del archivo.
+    const fileName = removeFileExtension(file.name);
+    const fileExtension = file.name.split('.').pop() || '';
+
+    return {
+      base64,
+      fileName,
+      fileExtension
+    };
+  };
+
+  const saveFilesVariantHandler = async () => {
+    if (category_bases_code == 'B') {
+      if (!mold_file || mold_file.length === 0) {
+        console.error('No file provided.');
+        return;
+      }
+
+      const file = mold_file[0];
+      const base64Content = await convertFileToBase64(file);
+
+      // Extraemos el nombre y extensión del archivo.
+      const fileName = removeFileExtension(file.name);
+      const fileExtension = file.name.split('.').pop() || '';
+
+      const body_mold: MoldAttachmentVariantRequest = {
+        garment_variant_id: variant_id ?? 0,
+        attachments: [
+          {
+            name: fileName,
+            extension: fileExtension,
+            mold_base64: base64Content
+          }
+        ]
+      };
+
+      const sil: SilhouetteVariant[] = typeConfigServices.silhouettes;
+
+      const attach = await Promise.all(
+        sil.map(async (e: SilhouetteVariant) => {
+          const technical_drawing = await proccessFile(e.files[0]);
+          const exploded_drawing = await proccessFile(e.files[1]);
+          const specific_drawing = await proccessFile(e.files[2]);
+
+          return {
+            silhouette_variant_id: e.id,
+            attachments: [
+              {
+                name: technical_drawing?.fileName ?? '',
+                technical_draw_base64: technical_drawing?.base64 ?? '',
+                extension: technical_drawing?.fileExtension ?? ''
+              },
+              {
+                name: exploded_drawing?.fileName ?? '',
+                cut_layout_base64: exploded_drawing?.base64 ?? '',
+                extension: exploded_drawing?.fileExtension ?? ''
+              },
+              {
+                name: specific_drawing?.fileName ?? '',
+                special_draw_base64: specific_drawing?.base64 ?? '',
+                extension: specific_drawing?.fileExtension ?? ''
+              }
+            ]
+          };
+        })
+      );
+
+      const body_draw_files: SilhouetteDrawRequest = {
+        silhouette_attachments: attach
+      };
+      const draw_files = await saveDrawSilhouette(body_draw_files);
+      const mold_response = await saveFilesVariant(body_mold);
+
+      return draw_files;
+    }
+  };
+
   const handleNext = async () => {
     if (activeStep === 1) {
       const body: VariantPayload = {
@@ -152,23 +281,30 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
       };
 
       const response = await saveBaseVariant(body);
-      if(response){
+      if (response) {
         setValue('variant_id', response?.id ?? 0);
+        setValue('typeConfigServices', response);
       }
-
     }
-    if(activeStep === 2){
-      const body:EmbroideryRequest = {
-        embroidery_variant: embroideries.filter((e:any)=>e.selected).map((e:any)=>{
-          return{
-            embroidery_id:e.id,
-            garment_variant_id: variant_id,
-            description: e.description
-          }
-        })
-      }
+    if (activeStep === 2) {
+      const body: EmbroideryRequest = {
+        embroidery_variant: embroideries
+          .filter((e: any) => e.selected)
+          .map((e: any) => {
+            return {
+              embroidery_id: e.id,
+              garment_variant_id: variant_id,
+              description: e.description
+            };
+          })
+      };
       const response = saveEmbroidery(body);
     }
+
+    if (activeStep === 3) {
+      const response = await saveFilesVariantHandler();
+    }
+
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
 
@@ -208,7 +344,7 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
         {activeStep === steps.length ? (
           <React.Fragment>
             <div className='mt-2 mb-2 font-semibold text-center'>
-              Cliente registrado de manera exitosa
+              Variante creada exitosamente
             </div>
             <div className='flex pt-2'>
               <div className=' flex-1' />
@@ -260,7 +396,7 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
                       color='secondary'
                       className='mt-4'
                     >
-                      Guardar Cliente
+                      Guardar variante
                     </Button>
                   </div>
                 )}

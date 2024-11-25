@@ -1,33 +1,33 @@
 'use client';
-import { Checkbox } from '@/components/ui/checkbox';
-import { FormControl, FormItem, FormLabel } from '@/components/ui/form';
-import { cn } from '@/lib/utils';
-import { arrayToReactSelect } from '@/util/arrayToSelect';
 import { FC, useEffect, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import SelectReact from 'react-select';
+import { SilhouetteVariant } from '../../../services/crudVariants';
 
 const Step5: FC = () => {
   // React Hook Form
-  const { control, setValue, watch, getValues } = useFormContext();
+  const { control, setValue, watch, getValues, register } = useFormContext();
   const [isLoading, setIsLoading] = useState(false);
   const hasFetched = useRef(false);
 
-  const type_config = watch('typeConfig');
-  const type_size = getValues('typeSize');
+  const typeConfigServices = watch('typeConfigServices');
+
+  const type_config: SilhouetteVariant[] = typeConfigServices.silhouettes;
+  const measurementCategory = getValues('measurementCategory');
 
   useEffect(() => {
+    console.log(typeConfigServices);
     if (type_config && !hasFetched.current) {
       hasFetched.current = true;
       setValue(
-        'typeConfig',
-        type_config.map((type: any) => ({
+        'typeConfigServices.silhouettes',
+        type_config.map((type: SilhouetteVariant) => ({
           ...type,
-          selected: type.selected || false,
-          hasZipper: type.hasZipper || false,
-          typeSizes: type_size.map((size: any) => ({
+          sizes: typeConfigServices.sizes.map((size: any) => ({
             ...size,
-            categories: Array(4).fill(null)
+            categories: measurementCategory.map((measurement: any) => ({
+              ...measurement,
+              value: ''
+            }))
           }))
         }))
       );
@@ -49,49 +49,52 @@ const Step5: FC = () => {
           <div className='flex flex-col'>
             {type_config.map((type: any, typeIndex: number) => (
               <>
-                <h3 className='font-semibold text-gray-700 mt-4 text-primary text-base'>{type.name}</h3>
+                <h3
+                  key={type.id}
+                  className='font-semibold text-gray-700 mt-4 text-primary text-base'
+                >
+                  {type.silhouettes.name}
+                </h3>
 
-                {type?.selected && (
-                  <div className='w-full'>
-                    {type?.typeSizes &&
-                      type.typeSizes?.map(
-                        (typeSize: any, sizeIndex: any) =>
-                          typeSize.selected && (
-                            <div key={typeSize.sizeId} className='my-2 border-primary border p-2 rounded-md'>
-                              <h4 className='font-semibold text-gray-700'>
-                                Talla {typeSize.name}
-                              </h4>
-                              <div className='flex '>
-                                {typeSize.categories.map(
-                                  (_: any, fieldIndex: number) => (
-                                    <Controller
-                                      key={fieldIndex}
-                                      name={`typeConfig.${typeIndex}.typeSizes.${sizeIndex}.categories.${fieldIndex}`}
-                                      control={control}
-                                      render={({ field }) => (
-                                        <div className='flex flex-col mr-4'>
-                                          <label
-                                            htmlFor={`typeConfig.${typeIndex}.typeSizes.${sizeIndex}.categories.${fieldIndex}`}
-                                            className='text-sm text-gray-600'
-                                          >
-                                            Campo {fieldIndex + 1}
-                                          </label>
-                                          <input
-                                            type='text'
-                                            {...field}
-                                            className='border rounded p-2'
-                                          />
-                                        </div>
-                                      )}
+                <div className='w-full'>
+                  {type?.sizes &&
+                    type.sizes?.map((typeSize: any, sizeIndex: any) => (
+                      <div
+                        key={typeSize.size_id}
+                        className='my-2 border-primary border p-2 rounded-md'
+                      >
+                        <h4 className='font-semibold text-gray-700'>
+                          Talla {typeSize.sizes.name}
+                        </h4>
+                        <div className='flex '>
+                          {measurementCategory.map(
+                            (_: any, fieldIndex: number) => (
+                              <Controller
+                                key={fieldIndex}
+                                name={`typeConfigServices.silhouettes.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
+                                control={control}
+                                render={({ field }) => (
+                                  <div className='flex flex-col mr-4'>
+                                    <label
+                                      htmlFor={`typeConfigServices.silhouettes.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
+                                      className='text-sm text-gray-600'
+                                    >
+                                      {_.name}
+                                    </label>
+                                    <input
+                                      type='text'
+                                      {...register(`typeConfigServices.silhouettes.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`)}
+                                      className='border rounded p-2'
                                     />
-                                  )
+                                  </div>
                                 )}
-                              </div>
-                            </div>
-                          )
-                      )}
-                  </div>
-                )}
+                              />
+                            )
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </>
             ))}
           </div>

@@ -8,6 +8,7 @@ import {
   getBoot,
   getLenght,
   getLines,
+  getMeasurementCategory,
   getSilhouette,
   getSizeCategory
 } from '../../../services/crudVariants';
@@ -48,6 +49,7 @@ const Step2: FC<Props> = ({ bases = [] }) => {
     setIsLoading(true);
     const length = await getLenght(category_base_id);
     const size = await getSizeCategory(category_base_id);
+    const measurementCategory = await getMeasurementCategory(category_base_id);
     try {
       if (category_bases_code === 'B') {
         const config = await getSilhouette();
@@ -81,6 +83,8 @@ const Step2: FC<Props> = ({ bases = [] }) => {
         'typeSize',
         size.map(item => ({ ...item, selected: true }))
       );
+
+      setValue('measurementCategory', measurementCategory);
     } finally {
       setIsLoading(false);
     }
