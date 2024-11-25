@@ -20,6 +20,8 @@ import {
   listSupplier,
   listColor,
   listTypeSupply,
+  listTypeSupplyByType,
+  listSupplierByTypeService,
 } from "@/views/services/master";
 import toast from "react-hot-toast";
 import { createSpplyColorSupplier, listSupplyColorSupplier } from "../services";
@@ -29,9 +31,18 @@ import { Form, FormControl, FormItem } from "@/components/ui/form";
 
 export const columns: ColumnDef<ColorXSupplier>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "code",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Código" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("code")}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nombre" />
     ),
     cell: ({ row }) => <div>{row.getValue("name")}</div>,
     enableSorting: false,
@@ -73,6 +84,7 @@ export const columns: ColumnDef<ColorXSupplier>[] = [
 ];
 
 const schema = z.object({
+  code: z.string().min(2),
   name: z.string().min(2),
   supply_color_id: z.any(),
   suppliers_id: z.any(),
@@ -84,6 +96,7 @@ const BlankPage = () => {
     resolver: zodResolver(schema),
     mode: "all",
     defaultValues: {
+      code: "",
       name: "",
       supply_color_id: null,
       suppliers_id: null,
@@ -122,8 +135,8 @@ const BlankPage = () => {
     try {
       setLoading(true);
       const [supplier, typeSupply, colors] = await Promise.all([
-        listSupplier(),
-        listTypeSupply(),
+        listSupplierByTypeService("insumos"),
+        listTypeSupplyByType("2"),
         listColor(),
       ]);
 
@@ -241,7 +254,11 @@ const BlankPage = () => {
                     />
                   </div>
                   <div className="col-span-2 flex flex-col gap-2">
-                    <Label htmlFor="name">Código</Label>
+                    <Label htmlFor="code">Código</Label>
+                    <Input type="text" id="code" {...register("code")} />
+                  </div>
+                  <div className="col-span-2 flex flex-col gap-2">
+                    <Label htmlFor="name">Nombre</Label>
                     <Input type="text" id="name" {...register("name")} />
                   </div>
                   <div className="col-span-2">

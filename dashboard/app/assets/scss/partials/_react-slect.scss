@@ -5,7 +5,7 @@
     }
   }
   .select__control {
-    @apply bg-background h-8 border border-default-200 focus:border-primary;
+    @apply bg-background border border-default-200 focus:border-primary;
   }
   .select__single-value{
     @apply text-sm font-medium text-default-800;

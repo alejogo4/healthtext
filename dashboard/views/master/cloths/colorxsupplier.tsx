@@ -22,6 +22,7 @@ import {
   listColor,
   listTypeSupply,
   listCategory,
+  listSupplierByTypeService,
 } from "@/views/services/master";
 import toast from "react-hot-toast";
 import { createColorClothSupplier, listColorClothSupplier } from "../services";
@@ -30,9 +31,18 @@ import { Loader2 } from "lucide-react";
 
 export const columns: ColumnDef<ColorXSupplier>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "code",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Código" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("code")}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nombre" />
     ),
     cell: ({ row }) => <div>{row.getValue("name")}</div>,
     enableSorting: false,
@@ -73,6 +83,7 @@ export const columns: ColumnDef<ColorXSupplier>[] = [
 ];
 
 const schema = z.object({
+  code: z.string().min(2),
   name: z.string().min(2),
   supply_color_id: z.any(),
   suppliers_id: z.any(),
@@ -85,6 +96,7 @@ const BlankPage = () => {
     mode: "all",
     defaultValues: {
       name: "",
+      code: "",
       supply_color_id: null,
       suppliers_id: null,
       supply_categories_id: null,
@@ -106,7 +118,6 @@ const BlankPage = () => {
   const [supplyCategories, setSupplyCategories] = useState<Master[]>([]);
   const [supplyColors, setSupplyColors] = useState<Master[]>([]);
 
-
   useEffect(() => {
     setDataLoading(true);
     getData();
@@ -123,7 +134,7 @@ const BlankPage = () => {
     try {
       setLoading(true);
       const [supplier, typeSupply, colors] = await Promise.all([
-        listSupplier(),
+        listSupplierByTypeService("telas"),
         listCategory("CLOTH"),
         listColor(),
       ]);
@@ -181,7 +192,7 @@ const BlankPage = () => {
                       control={form.control}
                       name="suppliers_id"
                       render={({ field: { onChange, onBlur, value, ref } }) => (
-                        <FormItem className="mt-3">
+                        <FormItem >
                           <Label htmlFor="name">Proveedor</Label>
                           <FormControl>
                             <Select
@@ -203,7 +214,7 @@ const BlankPage = () => {
                       control={form.control}
                       name="supply_categories_id"
                       render={({ field: { onChange, onBlur, value, ref } }) => (
-                        <FormItem className="mt-3">
+                        <FormItem >
                           <Label htmlFor="name">Categorias</Label>
                           <FormControl>
                             <Select
@@ -225,7 +236,7 @@ const BlankPage = () => {
                       control={form.control}
                       name="supply_color_id"
                       render={({ field: { onChange, onBlur, value, ref } }) => (
-                        <FormItem className="mt-3">
+                        <FormItem >
                           <Label htmlFor="name">Color</Label>
                           <FormControl>
                             <Select
@@ -243,7 +254,11 @@ const BlankPage = () => {
                     />
                   </div>
                   <div className="col-span-2 flex flex-col gap-2">
-                    <Label htmlFor="name">Código</Label>
+                    <Label htmlFor="code">Código</Label>
+                    <Input type="text" id="code" {...register("code")} />
+                  </div>
+                  <div className="col-span-2 flex flex-col gap-2">
+                    <Label htmlFor="name">Nombre</Label>
                     <Input type="text" id="name" {...register("name")} />
                   </div>
                   <div className="col-span-2">

@@ -1,6 +1,6 @@
 "use client";
 import { Fragment, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -20,6 +20,7 @@ import { Master } from "@/views/types/master";
 import { createTypeSupply, listTypeSupply } from "../services";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export const columns: ColumnDef<Master>[] = [
   {
@@ -32,6 +33,15 @@ export const columns: ColumnDef<Master>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "type",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tipo" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("type") == "1" ? "Telas" : "Insumos"}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
@@ -39,6 +49,7 @@ export const columns: ColumnDef<Master>[] = [
 
 const schema = z.object({
   name: z.string().min(2),
+  type: z.string(),
 });
 
 const Page = () => {
@@ -50,12 +61,15 @@ const Page = () => {
     register,
     handleSubmit,
     reset,
+    control,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
     mode: "all",
     defaultValues: {
       name: "",
+      type: "2",
     },
   });
 
@@ -79,6 +93,7 @@ const Page = () => {
       getData();
       toast.success(response["message"]);
       reset();
+      setValue("type", "2");
     } else {
       toast.error(response["message"]);
     }
@@ -90,7 +105,9 @@ const Page = () => {
       <Breadcrumbs>
         <BreadcrumbItem>Administrativo</BreadcrumbItem>
         <BreadcrumbItem>Maestros</BreadcrumbItem>
-        <BreadcrumbItem className="text-primary">Tipos de insumos</BreadcrumbItem>
+        <BreadcrumbItem className="text-primary">
+          Tipos de insumos
+        </BreadcrumbItem>
       </Breadcrumbs>
       <div className="grid grid-cols-[1fr_2fr] gap-4 mt-5">
         <Card>
@@ -113,6 +130,25 @@ const Page = () => {
                   {errors.name && (
                     <div className=" text-destructive mt-2">
                       {errors.name.message}
+                    </div>
+                  )}
+                </div>
+                <div className="col-span-2">
+                  <Controller
+                    name="type"
+                    control={control}
+                    render={({ field }) => (
+                      <RadioGroup onChange={(value) => field.onChange(value)} defaultValue={field.value}>
+                        <RadioGroupItem value="2" >
+                          Insumos
+                        </RadioGroupItem>
+                        <RadioGroupItem value="1">Telas</RadioGroupItem>
+                      </RadioGroup>
+                    )}
+                  />
+                  {errors.type && (
+                    <div className=" text-destructive mt-2">
+                      {errors.type.message}
                     </div>
                   )}
                 </div>
