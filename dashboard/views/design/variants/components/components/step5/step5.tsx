@@ -10,27 +10,53 @@ const Step5: FC = () => {
   const hasFetched = useRef(false);
 
   const typeConfigServices = watch('typeConfigServices');
+  const category_bases_code = watch('category_bases_code');
+  console.log(typeConfigServices);
 
-  const type_config: SilhouetteVariant[] = typeConfigServices.silhouettes;
+  const type_config =
+    typeConfigServices.silhouettes.length > 0
+      ? typeConfigServices.silhouettes
+      : typeConfigServices.boot_types;
+
+  const key_value =
+    typeConfigServices.silhouettes.length > 0
+      ? 'typeConfigServices.silhouettes'
+      : 'typeConfigServices.boot_types';
+
   const measurementCategory = getValues('measurementCategory');
 
+  const specialVariant =
+    category_bases_code == 'B' || category_bases_code == 'P';
+
   useEffect(() => {
-    console.log(typeConfigServices);
     if (type_config && !hasFetched.current) {
       hasFetched.current = true;
-      setValue(
-        'typeConfigServices.silhouettes',
-        type_config.map((type: SilhouetteVariant) => ({
-          ...type,
-          sizes: typeConfigServices.sizes.map((size: any) => ({
+      if (specialVariant) {
+        setValue(
+          key_value,
+          type_config.map((type: SilhouetteVariant) => ({
+            ...type,
+            sizes: typeConfigServices.sizes.map((size: any) => ({
+              ...size,
+              categories: measurementCategory.map((measurement: any) => ({
+                ...measurement,
+                value: ''
+              }))
+            }))
+          }))
+        );
+      } else {
+        setValue(
+          'typeConfigServices.sizes',
+          typeConfigServices.sizes.map((size: any) => ({
             ...size,
             categories: measurementCategory.map((measurement: any) => ({
               ...measurement,
               value: ''
             }))
           }))
-        }))
-      );
+        );
+      }
     }
   }, []);
 
@@ -47,56 +73,103 @@ const Step5: FC = () => {
       <div className='w-full'>
         <div className='flex flex-col gap-2 flex-wrap'>
           <div className='flex flex-col'>
-            {type_config.map((type: any, typeIndex: number) => (
-              <>
-                <h3
-                  key={type.id}
-                  className='font-semibold text-gray-700 mt-4 text-primary text-base'
-                >
-                  {type.silhouettes.name}
-                </h3>
+            {specialVariant &&
+              type_config.map((type: any, typeIndex: number) => {
+                const config_item = type?.silhouettes
+                  ? type.silhouettes
+                  : type?.boot_type;
+                return (
+                  <>
+                    <h3
+                      key={type.id}
+                      className='font-semibold text-gray-700 mt-4 text-primary text-base'
+                    >
+                      {config_item.name}
+                    </h3>
 
-                <div className='w-full'>
-                  {type?.sizes &&
-                    type.sizes?.map((typeSize: any, sizeIndex: any) => (
-                      <div
-                        key={typeSize.size_id}
-                        className='my-2 border-primary border p-2 rounded-md'
-                      >
-                        <h4 className='font-semibold text-gray-700'>
-                          Talla {typeSize.sizes.name}
-                        </h4>
-                        <div className='flex '>
-                          {measurementCategory.map(
-                            (_: any, fieldIndex: number) => (
-                              <Controller
-                                key={fieldIndex}
-                                name={`typeConfigServices.silhouettes.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
-                                control={control}
-                                render={({ field }) => (
-                                  <div className='flex flex-col mr-4'>
-                                    <label
-                                      htmlFor={`typeConfigServices.silhouettes.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
-                                      className='text-sm text-gray-600'
-                                    >
-                                      {_.name}
-                                    </label>
-                                    <input
-                                      type='text'
-                                      {...register(`typeConfigServices.silhouettes.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`)}
-                                      className='border rounded p-2'
-                                    />
-                                  </div>
-                                )}
-                              />
-                            )
-                          )}
-                        </div>
-                      </div>
+                    <div className='w-full'>
+                      {type?.sizes &&
+                        type.sizes?.map((typeSize: any, sizeIndex: any) => (
+                          <div
+                            key={typeSize.size_id}
+                            className='my-2 border-primary border p-2 rounded-md'
+                          >
+                            <h4 className='font-semibold text-gray-700'>
+                              Talla {typeSize.sizes.name}
+                            </h4>
+                            <div className='flex '>
+                              {measurementCategory.map(
+                                (_: any, fieldIndex: number) => (
+                                  <Controller
+                                    key={fieldIndex}
+                                    name={`${key_value}.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
+                                    control={control}
+                                    render={({ field }) => (
+                                      <div className='flex flex-col mr-4'>
+                                        <label
+                                          htmlFor={`${key_value}.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
+                                          className='text-sm text-gray-600'
+                                        >
+                                          {_.name}
+                                        </label>
+                                        <input
+                                          type='text'
+                                          {...register(
+                                            `${key_value}.${typeIndex}.sizes.${sizeIndex}.categories.${fieldIndex}.value`
+                                          )}
+                                          className='border rounded p-2'
+                                        />
+                                      </div>
+                                    )}
+                                  />
+                                )
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                );
+              })}
+
+            {!specialVariant &&
+              typeConfigServices?.sizes &&
+              typeConfigServices.sizes?.map((typeSize: any, sizeIndex: any) => (
+                <div
+                  key={typeSize.size_id}
+                  className='my-2 border-primary border p-2 rounded-md'
+                >
+                  <h4 className='font-semibold text-gray-700'>
+                    Talla {typeSize.sizes.name}
+                  </h4>
+                  <div className='flex '>
+                    {measurementCategory.map((_: any, fieldIndex: number) => (
+                      <Controller
+                        key={fieldIndex}
+                        name={`typeConfigServices.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className='flex flex-col mr-4'>
+                            <label
+                              htmlFor={`typeConfigServices.sizes.${sizeIndex}.categories.${fieldIndex}.value`}
+                              className='text-sm text-gray-600'
+                            >
+                              {_.name}
+                            </label>
+                            <input
+                              type='text'
+                              {...register(
+                                `typeConfigServices.sizes.${sizeIndex}.categories.${fieldIndex}.value`
+                              )}
+                              className='border rounded p-2'
+                            />
+                          </div>
+                        )}
+                      />
                     ))}
+                  </div>
                 </div>
-              </>
-            ))}
+              ))}
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@ import { useForm } from 'react-hook-form';
 
 import { CategoryBase } from '../../services/categoriesBase';
 import { z } from 'zod';
-import { convertFileToBase64 } from '@/util/file';
+import { convertFileToBase64, getImage } from '@/util/file';
 import { editBaseCategory } from '../../services/crudCategoriesBase';
 import toast from 'react-hot-toast';
 
@@ -39,16 +39,17 @@ export interface FormType {
 
 const EditCategoryBase: FC<Props> = ({ categoriesBase }) => {
   const onSubmit = async (data: any) => {
-
     if (data.packing_photo instanceof File) {
+      data.extension = data.packing_photo.name.split('.').pop() || '';
       data.packing_photo = await convertFileToBase64(data.packing_photo);
-      data.packing_photo = data.packing_photo.slice(0,10)
+
+      data.packing_photo = data.packing_photo;
     }
     data.id = categoriesBase.id;
 
     const response = await editBaseCategory(data);
-    if(response.status){
-        toast.success(response?.message);
+    if (response.status) {
+      toast.success(response?.message);
     }
   };
 
@@ -74,6 +75,8 @@ const EditCategoryBase: FC<Props> = ({ categoriesBase }) => {
     const fieldError = errors[key as keyof typeof errors];
     return <p key={key}>{fieldError?.message}</p>;
   });
+
+  const image = categoriesBase?.packing_photo;
 
   return (
     <div className='mt-4'>
@@ -110,15 +113,26 @@ const EditCategoryBase: FC<Props> = ({ categoriesBase }) => {
                 />
               </div>
               <div className='col-span-12 lg:col-span-6'>
+                {image ? (
+                  <img
+                    src={getImage(image)}
+                    alt='Foto de empaque'
+                    style={{ width: '100px', height: 'auto' }}
+                  />
+                ) : (
+                  <span>Sin imagen</span>
+                )}
                 <FormField
                   control={form.control}
                   name='packing_photo'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Foto</FormLabel>
+                    <FormItem className='mt-4'>
+                      <FormLabel>Agregar Foto</FormLabel>
                       <FormControl>
                         <Input
                           type='file'
+                          accept='image/*'
+                          multiple={false}
                           onChange={e => {
                             field.onChange(e.target.files?.[0] || '');
                           }}

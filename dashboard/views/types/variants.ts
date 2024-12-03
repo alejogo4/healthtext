@@ -15,7 +15,27 @@
     sizes: Size[]
     lenghts: Lenght[]
     embroideries: Embroidery[]
-    boot_types: any[]
+    boot_types: BootType[]
+  }
+
+  export interface BootType {
+    id: number
+    boot_type_id: number
+    garment_variant_id: number
+    technical_draw_path: any
+    special_draw_path: any
+    cut_layout_path: any
+    created_at: string
+    updated_at: string
+    has_zipper: number
+    boot_type: BootType2
+  }
+  
+  export interface BootType2 {
+    id: number
+    name: string
+    created_at: any
+    updated_at: any
   }
   
   export interface SupplyLine {

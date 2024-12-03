@@ -14,6 +14,7 @@ import {
 } from '../../services/crudCategoriesBase';
 import toast from 'react-hot-toast';
 import EditCategoryBase from '../editCategoryBase/editCategoryBase';
+import { getImage } from '@/util/file';
 
 export type Props = {
   categoriesBase: CategoryBase[] | [];
@@ -54,6 +55,26 @@ const CategoryBaseList = ({ categoriesBase }: Props) => {
 
   const columnsdt: ColumnDef<CategoryBase>[] = [
     {
+      accessorKey: 'packing_photo',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Foto' />
+      ),
+      cell: ({ row }) => {
+        const image = row.getValue('packing_photo') as string;
+        return image ? (
+          <img
+            src={getImage(image)} 
+            alt='Foto de empaque'
+            style={{ width: '50px', height: 'auto' }}
+          />
+        ) : (
+          <span>Sin imagen</span>
+        );
+      },
+      enableSorting: false,
+      enableHiding: false
+    },
+    {
       accessorKey: 'name',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Nombre' />
@@ -77,21 +98,9 @@ const CategoryBaseList = ({ categoriesBase }: Props) => {
     {
       accessorKey: 'code',
       header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title='Código'
-        />
+        <DataTableColumnHeader column={column} title='Código' />
       ),
       cell: ({ row }) => <div>{row.getValue('code')}</div>,
-      enableSorting: false,
-      enableHiding: false
-    },
-    {
-      accessorKey: 'packing_photo',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Foto' />
-      ),
-      cell: ({ row }) => <div>{row.getValue('packing_photo')}</div>,
       enableSorting: false,
       enableHiding: false
     },

@@ -74,6 +74,7 @@ export const listBaseClient = async () => {
   }
 };
 
+//pattern-base-variant-without
 export const listBase = async () => {
   try {
     const data = await httpRequestServer<ApiResponse<BaseType[]>>(

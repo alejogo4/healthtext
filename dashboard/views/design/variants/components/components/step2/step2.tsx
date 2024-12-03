@@ -129,57 +129,52 @@ const Step2: FC<Props> = ({ bases = [] }) => {
           </FormItem>
         )}
       />
+
+      {typeConfig.length == 0 && (
+        <Controller
+          control={control}
+          name='zipper_id'
+          render={({ field: { onChange, onBlur, value, ref } }) => (
+            <FormItem className='mt-4'>
+              <FormLabel>Tiene cremallera?</FormLabel>
+              <FormControl>
+                <SelectReact
+                  className='react-select'
+                  classNamePrefix='select'
+                  options={[
+                    { label: 'Si', value: true },
+                    { label: 'No', value: false }
+                  ]}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      )}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
-        <div className='w-full'>
-          <h5 className='text-base font-medium text-default-800 mb-2'>
-            {titleConfig}
-          </h5>
-          <div className='flex flex-col gap-2 flex-wrap'>
-            <div className='flex flex-col gap-4'>
-              {typeConfig.map((type, index) => (
-                <div
-                  key={type.id}
-                  className={cn('flex flex-col gap-2', {
-                    'border-primary border rounded-md': watch(
-                      `typeConfig.${index}.selected`
-                    )
-                  })}
-                >
-                  {/* Control para Selección */}
-                  <Controller
-                    name={`typeConfig.${index}.selected`}
-                    control={control}
-                    render={({ field }) => (
-                      <div
-                        className={cn(
-                          'bg-default-100 h-8 px-2 rounded-md inline-flex flex-col justify-center',
-                          {
-                            'bg-primary/10': field.value
-                          }
-                        )}
-                      >
-                        <label className='flex items-center'>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={value => field.onChange(value)}
-                          />
-                          <span
-                            className={cn('ml-2 text-default-600', {
-                              'text-primary': field.value
-                            })}
-                          >
-                            {type.name}
-                          </span>
-                        </label>
-                      </div>
-                    )}
-                  />
-                  {/* Render Condicional para Cremallera */}
-                  {watch(`typeConfig.${index}.selected`) && (
+        {titleConfig.length > 0 && (
+          <div className='w-full'>
+            <h5 className='text-base font-medium text-default-800 mb-2'>
+              {titleConfig}
+            </h5>
+            <div className='flex flex-col gap-2 flex-wrap'>
+              <div className='flex flex-col gap-4'>
+                {typeConfig.map((type, index) => (
+                  <div
+                    key={type.id}
+                    className={cn('flex flex-col gap-2', {
+                      'border-primary border rounded-md': watch(
+                        `typeConfig.${index}.selected`
+                      )
+                    })}
+                  >
+                    {/* Control para Selección */}
                     <Controller
-                      name={`typeConfig.${index}.hasZipper`}
+                      name={`typeConfig.${index}.selected`}
                       control={control}
-                      defaultValue={false}
                       render={({ field }) => (
                         <div
                           className={cn(
@@ -194,62 +189,96 @@ const Step2: FC<Props> = ({ bases = [] }) => {
                               checked={field.value}
                               onCheckedChange={value => field.onChange(value)}
                             />
-
                             <span
                               className={cn('ml-2 text-default-600', {
                                 'text-primary': field.value
                               })}
                             >
-                              Tiene Cremallera
+                              {type.name}
                             </span>
                           </label>
                         </div>
                       )}
                     />
+                    {/* Render Condicional para Cremallera */}
+                    {watch(`typeConfig.${index}.selected`) && (
+                      <Controller
+                        name={`typeConfig.${index}.hasZipper`}
+                        control={control}
+                        defaultValue={false}
+                        render={({ field }) => (
+                          <div
+                            className={cn(
+                              'bg-default-100 h-8 px-2 rounded-md inline-flex flex-col justify-center',
+                              {
+                                'bg-primary/10': field.value
+                              }
+                            )}
+                          >
+                            <label className='flex items-center'>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={value => field.onChange(value)}
+                              />
+
+                              <span
+                                className={cn('ml-2 text-default-600', {
+                                  'text-primary': field.value
+                                })}
+                              >
+                                Tiene Cremallera
+                              </span>
+                            </label>
+                          </div>
+                        )}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        {typeLenght.length > 0 && (
+          <div className='w-full'>
+            <h5 className='text-base font-medium text-default-800 mb-2'>
+              Seleccionar largo
+            </h5>
+            <div className='flex flex-col gap-2 flex-wrap'>
+              {typeLenght.map((typeLenght, index) => (
+                <Controller
+                  key={typeLenght.id}
+                  name={`typeLenght.${index}.selected`}
+                  control={control}
+                  render={({ field }) => (
+                    <div
+                      className={cn(
+                        'bg-default-100 h-8 px-2 rounded-md inline-flex flex-col justify-center',
+                        {
+                          'bg-primary/10': field.value
+                        }
+                      )}
+                    >
+                      <label className='flex items-center'>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={value => field.onChange(value)}
+                        />
+                        <span
+                          className={cn('ml-2 text-default-600', {
+                            'text-primary': field.value
+                          })}
+                        >
+                          {typeLenght.name}
+                        </span>
+                      </label>
+                    </div>
                   )}
-                </div>
+                />
               ))}
             </div>
           </div>
-        </div>
-        <div className='w-full'>
-          <h5 className='text-base font-medium text-default-800 mb-2'>
-            Seleccionar largo
-          </h5>
-          <div className='flex flex-col gap-2 flex-wrap'>
-            {typeLenght.map((typeLenght, index) => (
-              <Controller
-                key={typeLenght.id}
-                name={`typeLenght.${index}.selected`}
-                control={control}
-                render={({ field }) => (
-                  <div
-                    className={cn(
-                      'bg-default-100 h-8 px-2 rounded-md inline-flex flex-col justify-center',
-                      {
-                        'bg-primary/10': field.value
-                      }
-                    )}
-                  >
-                    <label className='flex items-center'>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={value => field.onChange(value)}
-                      />
-                      <span
-                        className={cn('ml-2 text-default-600', {
-                          'text-primary': field.value
-                        })}
-                      >
-                        {typeLenght.name}
-                      </span>
-                    </label>
-                  </div>
-                )}
-              />
-            ))}
-          </div>
-        </div>
+        )}
       </div>
       <div className='w-full my-6'>
         <h5 className='text-base font-medium text-default-800 mb-2'>

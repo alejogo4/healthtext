@@ -24,11 +24,14 @@ import { DataTableColumnHeader } from '@/components/ui/datatable/data-table-colu
 import { DataTableRowActions } from '@/components/ui/datatable/data-table-row-actions';
 import { ColumnDef } from '@tanstack/react-table';
 
-import { Master } from '@/views/types/master';
+
 
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { createLong, deleteLong, listLong } from '../services/crudLong';
+import { CategoryBases, createLong, deleteLong, listLong, LongType } from '../services/crudLong';
+import { CategoryBase } from '../../base/services/categoriesBase';
+import { listBaseCategory } from '../../base/services/crudCategoriesBase';
+import { arrayToReactSelect } from '@/util/arrayToSelect';
 
 const schema = z.object({
   name: z.string().min(2),
@@ -54,11 +57,12 @@ export interface FormType {
 }
 
 const LongPage = () => {
-  const [data, setData] = useState<Master[] | []>([]);
+  const [data, setData] = useState<LongType[] | []>([]);
   const [dataLoading, setDataLoading] = useState(false);
+  const [dataCategories, setDataCategories] = useState<CategoryBase[] | []>([]);
   const [loading, setLoading] = useState(false);
 
-  const columns: ColumnDef<Master>[] = [
+  const columns: ColumnDef<LongType>[] = [
     {
       accessorKey: 'name',
       header: ({ column }) => (
@@ -69,11 +73,20 @@ const LongPage = () => {
       enableHiding: false
     },
     {
-      accessorKey: 'group',
+      accessorKey: 'category_bases',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Grupo' />
+        <DataTableColumnHeader column={column} title='Categoría' />
       ),
-      cell: ({ row }) => <div>{row.getValue('group')}</div>,
+      cell: ({ row }) => <div>{(row.getValue('category_bases') as CategoryBases)?.name }</div>,
+      enableSorting: false,
+      enableHiding: false
+    },
+    {
+      accessorKey: 'category_bases',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Código' />
+      ),
+      cell: ({ row }) => <div>{(row.getValue('category_bases') as CategoryBases)?.code}</div>,
       enableSorting: false,
       enableHiding: false
     },
@@ -83,7 +96,7 @@ const LongPage = () => {
         <DataTableRowActions
           onPressDelete={onDeleteItem}
           row={row}
-          id={row.original.id}
+          id={row.original.id.toString()}
         />
       )
     }
@@ -115,6 +128,8 @@ const LongPage = () => {
 
   const getData = async () => {
     const _data = await listLong();
+    const categoryData = await listBaseCategory();
+    setDataCategories(categoryData)
     setData(_data);
     setDataLoading(false);
   };
@@ -132,6 +147,7 @@ const LongPage = () => {
     group: { value: string; label: string };
   }) => {
     setLoading(true);
+    console.log(data);
     let response = await createLong(data.name, data.group.value);
     if (response?.status) {
       getData();
@@ -189,31 +205,13 @@ const LongPage = () => {
                           'text-destructive': form.formState.errors.group
                         })}
                       >
-                        Seleccionar grupo
+                        Seleccionar Categoría
                       </FormLabel>
                       <FormControl>
                         <SelectReact
                           className='react-select'
                           classNamePrefix='select'
-                          options={[
-                            { value: 'XS', label: 'XS' },
-                            { value: 'S', label: 'S' },
-                            { value: 'M', label: 'M' },
-                            { value: 'L', label: 'L' },
-                            { value: 'XL', label: 'XL' },
-                            { value: 'XXL', label: 'XXL' },
-                            { value: '3XL', label: '3XL' },
-                            { value: '4XL', label: '4XL' },
-                            { value: '28', label: '28' },
-                            { value: '30', label: '30' },
-                            { value: '32', label: '32' },
-                            { value: '34', label: '34' },
-                            { value: '36', label: '36' },
-                            { value: '38', label: '38' },
-                            { value: '40', label: '40' },
-                            { value: '42', label: '42' },
-                            { value: '44', label: '44' }
-                          ]}
+                          options={arrayToReactSelect(dataCategories)}
                           onChange={onChange}
                           onBlur={onBlur}
                           value={value}

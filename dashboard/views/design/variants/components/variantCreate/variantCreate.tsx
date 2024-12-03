@@ -12,10 +12,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { formSchema } from '../../schema/formCreate';
 import {
+  BootDrawRequest,
   EmbroideryRequest,
   MeasurementRequest,
   MoldAttachmentVariantRequest,
   saveBaseVariant,
+  saveDrawBoot,
   saveDrawSilhouette,
   saveEmbroidery,
   saveFilesVariant,
@@ -53,6 +55,7 @@ export interface FormType {
   category_bases_code: string;
   category_base_id: string;
   line_id: { value: string; label: string };
+  zipper_id: { value: boolean; label: string };
   typeLenght: any;
   typeConfig: any;
   typeConfigServices: any;
@@ -60,6 +63,12 @@ export interface FormType {
   embroideries: any;
   variant_id?: number;
   mold_file: any;
+  technical_photo: any;
+  commercial_photo: any;
+  technical_drawing: any;
+  exploded_drawing: any;
+  specific_drawing: any;
+
   // document_type_id: { value: string; label: string };
   // document_number: string;
   // name: string;
@@ -81,17 +90,37 @@ export interface FormType {
 
 function mapToMeasurementRequest(data: any): MeasurementRequest {
   return {
-    sizes: data.map((item: any) => {
-      return item.sizes.map((size: any) => ({
-        silhouettes_variant_id: item.garment_variant_id,
-        size_id: size.size_id,
-        measurement_categories: size.categories.map((category: any) => ({
-          measurement_category_id: category.id,
-          value: parseFloat(category.value),
-        })),
-      }));
-    }).flat(),
-    lengths: [],
+    sizes: data
+      .map((item: any) => {
+        return item.sizes.map((size: any) => ({
+          silhouettes_variant_id: item.garment_variant_id,
+          size_id: size.size_id,
+          measurement_categories: size.categories.map((category: any) => ({
+            measurement_category_id: category.id,
+            value: parseFloat(category.value)
+          }))
+        }));
+      })
+      .flat(),
+    lengths: []
+  };
+}
+
+function mapToBootMeasurementRequest(data: any): MeasurementRequest {
+  return {
+    sizes: data
+      .map((item: any) => {
+        return item.sizes.map((size: any) => ({
+          boot_type_variant_id: item.garment_variant_id,
+          size_id: size.size_id,
+          measurement_categories: size.categories.map((category: any) => ({
+            measurement_category_id: category.id,
+            value: parseFloat(category.value)
+          }))
+        }));
+      })
+      .flat(),
+    lengths: []
   };
 }
 
@@ -107,17 +136,11 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
   ];
 
   const onSubmit = async (data: any) => {
-
-    console.log(data);
-    const silhouettes = typeConfigServices.silhouettes;
-
-    const body: MeasurementRequest = mapToMeasurementRequest(silhouettes);
-    console.log(body);
-    const response = await saveMeasurement(body);
+    const response = await saveMeasures();
     reset();
     handleNext();
     toast({
-      title: response?.message
+      title: 'Variante creada correctamente'
     });
   };
   const isTablet = useMediaQuery('(max-width: 1024px)');
@@ -145,6 +168,9 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
   const embroideries = watch('embroideries');
   const variant_id = watch('variant_id');
   const mold_file = watch('mold_file');
+  const technical_photo = watch('technical_photo');
+  const commercial_photo = watch('commercial_photo');
+  const zipper_id = watch('zipper_id');
 
   // const typePerson = watch('document_type_id');
   // const accept_information = watch('authorizes_receive_information');
@@ -201,31 +227,23 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
     };
   };
 
-  const saveFilesVariantHandler = async () => {
+  const saveMeasures = async () => {
+    let response = null;
     if (category_bases_code == 'B') {
-      if (!mold_file || mold_file.length === 0) {
-        console.error('No file provided.');
-        return;
-      }
+      const silhouettes = typeConfigServices.silhouettes;
+      const body: MeasurementRequest = mapToMeasurementRequest(silhouettes);
+      response = await saveMeasurement(body, 'silhouette');
+    } else if (category_bases_code == 'P') {
+      const boot = typeConfigServices.boot_types;
+      const body: MeasurementRequest = mapToBootMeasurementRequest(boot);
+      response = await saveMeasurement(body, 'boot_type');
+    }
+    return response;
+  };
 
-      const file = mold_file[0];
-      const base64Content = await convertFileToBase64(file);
+  const saveFilesVariantHandler = async () => {
 
-      // Extraemos el nombre y extensión del archivo.
-      const fileName = removeFileExtension(file.name);
-      const fileExtension = file.name.split('.').pop() || '';
-
-      const body_mold: MoldAttachmentVariantRequest = {
-        garment_variant_id: variant_id ?? 0,
-        attachments: [
-          {
-            name: fileName,
-            extension: fileExtension,
-            mold_base64: base64Content
-          }
-        ]
-      };
-
+    if (category_bases_code == 'B') {
       const sil: SilhouetteVariant[] = typeConfigServices.silhouettes;
 
       const attach = await Promise.all(
@@ -261,10 +279,109 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
         silhouette_attachments: attach
       };
       const draw_files = await saveDrawSilhouette(body_draw_files);
-      const mold_response = await saveFilesVariant(body_mold);
+    } else if (category_bases_code == 'P') {
+      const boot: SilhouetteVariant[] = typeConfigServices.boot_types;
 
-      return draw_files;
+      const attach = await Promise.all(
+        boot.map(async (e: SilhouetteVariant) => {
+          const technical_drawing = await proccessFile(e.files[0]);
+          const exploded_drawing = await proccessFile(e.files[1]);
+          const specific_drawing = await proccessFile(e.files[2]);
+
+          return {
+            boot_type_variant_id: e.id,
+            attachments: [
+              {
+                name: technical_drawing?.fileName ?? '',
+                technical_draw_base64: technical_drawing?.base64 ?? '',
+                extension: technical_drawing?.fileExtension ?? ''
+              },
+              {
+                name: exploded_drawing?.fileName ?? '',
+                cut_layout_base64: exploded_drawing?.base64 ?? '',
+                extension: exploded_drawing?.fileExtension ?? ''
+              },
+              {
+                name: specific_drawing?.fileName ?? '',
+                special_draw_base64: specific_drawing?.base64 ?? '',
+                extension: specific_drawing?.fileExtension ?? ''
+              }
+            ]
+          };
+        })
+      );
+
+      const body_draw_files: BootDrawRequest = {
+        boot_type_attachments: attach
+      };
+      const draw_files = await saveDrawBoot(body_draw_files);
     }
+
+    if (!mold_file || mold_file.length === 0) {
+      console.error('No file provided.');
+      return;
+    }
+
+    if (!technical_photo || technical_photo.length === 0) {
+      console.error('No file provided.');
+      return;
+    }
+
+    if (!commercial_photo || commercial_photo.length === 0) {
+      console.error('No file provided.');
+      return;
+    }
+
+    //Molde
+    const file = mold_file[0];
+    const base64Content = await convertFileToBase64(file);
+    const fileName = removeFileExtension(file.name);
+    const fileExtension = file.name.split('.').pop() || '';
+    //technical_photo
+    const technical_photo_file = technical_photo[0];
+    const base64Content_technical_photo = await convertFileToBase64(
+      technical_photo_file
+    );
+    const fileName_technical_photo = removeFileExtension(
+      technical_photo_file.name
+    );
+    const fileExtension_technical_photo =
+      technical_photo_file.name.split('.').pop() || '';
+    //commercial_photo
+    const commercial_photo_file = commercial_photo[0];
+    const base64Content_commercial_photo = await convertFileToBase64(
+      commercial_photo_file
+    );
+    const fileName_commercial_photo = removeFileExtension(
+      commercial_photo_file.name
+    );
+    const fileExtension_commercial_photo =
+      commercial_photo_file.name.split('.').pop() || '';
+
+    const body_mold: MoldAttachmentVariantRequest = {
+      garment_variant_id: variant_id ?? 0,
+      attachments: [
+        {
+          name: fileName,
+          extension: fileExtension,
+          mold_base64: base64Content
+        },
+        {
+          name: fileName_technical_photo,
+          extension: fileExtension_technical_photo,
+          technical_draw_base64: base64Content_technical_photo
+        },
+        {
+          name: fileName_commercial_photo,
+          extension: fileExtension_commercial_photo,
+          commercial_photo_base64: base64Content_commercial_photo
+        }
+      ]
+    };
+
+    const mold_response = await saveFilesVariant(body_mold);
+
+    return mold_response;
   };
 
   const handleNext = async () => {
@@ -277,13 +394,17 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
           typeSize.filter((e: any) => e.selected).map((e: any) => e.id) ?? [],
         length_ids:
           typeLenght.filter((e: any) => e.selected).map((e: any) => e.id) ?? [],
-        supply_line_id: parseInt(line_id.value)
+        supply_line_id: parseInt(line_id.value),
+        has_zipper: zipper_id?.value ? zipper_id.value : false
       };
 
       const response = await saveBaseVariant(body);
       if (response) {
         setValue('variant_id', response?.id ?? 0);
-        setValue('typeConfigServices', response);
+        setValue('typeConfigServices', response); 
+      }
+      if(category_bases_code == 'I'){
+        setActiveStep(prevActiveStep => prevActiveStep + 2);
       }
     }
     if (activeStep === 2) {
@@ -404,7 +525,7 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
             </FormProvider>
 
             <div className='flex pt-2 '>
-              <Button
+              {/* <Button
                 size='xs'
                 variant='outline'
                 color='secondary'
@@ -414,17 +535,17 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
                 onClick={handleBack}
               >
                 Atrás
-              </Button>
+              </Button> */}
               <div className='flex-1	gap-4 ' />
               {activeStep !== steps.length - 1 && (
-                <div className='flex	gap-2 '>
+                <div className='flex	gap-2 mt-4'>
                   <Button
                     size='xs'
                     variant='outline'
                     color='secondary'
                     onClick={handleNext}
                   >
-                    Siguiente
+                    Guardar paso
                   </Button>
                 </div>
               )}

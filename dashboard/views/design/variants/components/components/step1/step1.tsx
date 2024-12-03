@@ -40,7 +40,7 @@ const Step1: FC<Props> = ({ bases = [] }) => {
             key={option.id}
             htmlFor={option.id.toString()}
             className={cn(
-              'min-w-[156px] min-h-[145px] bg-default-100 flex flex-col justify-center items-center rounded-md relative border border-none cursor-pointer',
+              'min-w-[166px] min-h-[165px] bg-default-100 flex flex-col justify-center items-center rounded-md relative border border-none cursor-pointer',
               {
                 'border-solid border-primary': base_id === option.id.toString()
               }
@@ -85,8 +85,14 @@ const Step1: FC<Props> = ({ bases = [] }) => {
                 height={64}
               />
             </div>
-            <span className='text-base font-medium text-default-800 capitalize mt-1.5 inline-block'>
+            <span className='text-base normal-case font-medium text-default-800 mt-1.5 inline-block'>
               {option.name}
+            </span>
+            <span className='text-xs normal-case text-default-800 mt-1.5 inline-block'>
+              {option.category_bases.name} ({option.category_bases.code})
+            </span>
+            <span className='text-xs normal-case text-default-800 mt-1.5 inline-block'>
+              {option.gender_types.name}
             </span>
           </label>
         ))}

@@ -12,4 +12,8 @@ function removeFileExtension(filename: string): string {
   return lastDotIndex !== -1 ? filename.slice(0, lastDotIndex) : filename;
 }
 
-export { convertFileToBase64, removeFileExtension };
+function getImage(fileUrl: string):string{
+  return `${process.env.NEXT_PUBLIC_SITE_URL}${fileUrl}`
+}
+
+export { convertFileToBase64, removeFileExtension, getImage};

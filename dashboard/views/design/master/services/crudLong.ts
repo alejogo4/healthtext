@@ -1,11 +1,30 @@
 import { ApiResponse, httpRequest } from '@/config/axios.config';
 import { Master } from '@/views/types/master';
 
-export const createLong = async (name: string, group: string) => {
+export interface LongType {
+  id: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  category_base_id: number;
+  category_bases: CategoryBases;
+}
+
+export interface CategoryBases {
+  id: number;
+  name: string;
+  packing_instructions?: string;
+  packing_photo?: string;
+  created_at?: string;
+  updated_at?: string;
+  code: string;
+}
+
+export const createLong = async (name: string, idCategory: string) => {
   try {
     const data = await httpRequest<ApiResponse<any>>(
       '/length',
-      { name, group },
+      { name, category_base_id: idCategory },
       'POST'
     );
 
@@ -18,7 +37,7 @@ export const createLong = async (name: string, group: string) => {
 
 export const listLong = async () => {
   try {
-    const data = await httpRequest<ApiResponse<Master[]>>(
+    const data = await httpRequest<ApiResponse<LongType[]>>(
       '/length',
       undefined,
       'GET'

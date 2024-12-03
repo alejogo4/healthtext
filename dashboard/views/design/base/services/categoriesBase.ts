@@ -5,6 +5,7 @@ export interface CategoryBase {
   name: string;
   packing_instructions: string;
   packing_photo: string;
+  extension: string;
 }
 
 export const fetchCategoriesBase = async () => {

@@ -241,6 +241,20 @@ export const menusConfig: Record<string, any> = {
                 href: '/design/master/long'
               }
             ]
+          },
+          {
+            title: 'Conjuntos',
+            icon: Grid,
+            nested: [
+              {
+                title: 'Crear conjuntos',
+                href: '/design/set/create'
+              },
+              {
+                title: 'Ver conjuntos',
+                href: '/design/set/list'
+              }
+            ]
           }
         ]
       },
