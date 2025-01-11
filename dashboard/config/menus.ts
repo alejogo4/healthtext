@@ -118,12 +118,12 @@ export const menusConfig: Record<string, any> = {
             icon: Dos,
             nested: [
               {
-                title: 'Crear nueva tela',
-                href: '/cloth/create'
+                title: 'Crear tela',
+                href: '/material/cloths/create'
               },
               {
                 title: 'Listar telas',
-                href: '/cloth/create'
+                href: '/material/cloths/list'
               }
             ]
           }

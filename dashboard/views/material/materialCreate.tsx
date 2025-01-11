@@ -1,15 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Select, { MultiValue } from "react-select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
 import { Form, FormControl, FormItem, FormLabel } from "@/components/ui/form";
 import { arrayToReactSelect } from "@/util/arrayToSelect";
 import { Master } from "../types/master";
@@ -24,34 +22,15 @@ import {
 } from "../services/master";
 import { listCategory, listSubCategory } from "../master/services";
 import { cn } from "@/lib/utils";
+import { schema } from "./schema/supplyCreate";
 import { CleaveInput } from "@/components/ui/cleave";
+import { createSupply } from "./services/crudSupply";
+import { mapFormToSupplyCreate } from "../types/supply";
+import { toast } from "@/components/ui/use-toast";
+import { convertFileToBase64 } from "@/util/file";
 
-const schema = z.object({
-  supply_type_id: z.object({ value: z.string(), label: z.string() }).required(),
-  supply_category_id: z
-    .object({ value: z.string(), label: z.string() })
-    .required(),
-  supply_subcategory_id: z
-    .object({ value: z.string(), label: z.string() })
-    .required(),
-  supply_presentation_id: z
-    .object({ value: z.string(), label: z.string() })
-    .required(),
-  supply_line_id: z.object({ value: z.string(), label: z.string() }).required(),
-  supply_unit_of_measure_id: z
-    .object({ value: z.string(), label: z.string() })
-    .required(),
-  supplier_id: z.object({ value: z.string(), label: z.string() }).required(),
-  supply_inventory_storage_id: z
-    .object({ value: z.string(), label: z.string() })
-    .required(),
-  base64: z.instanceof(File),
-  iva: z.preprocess((value) => Number(value), z.number()),
-  description: z.string().optional(),
-});
-
-const BlankPage = () => {
-  const [loading, setLoading] = useState(false);
+const CreateSupplyPage = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [inventories, setInventories] = useState<Record<string, any>[]>([]);
 
   const [supplyStorage, setSupplyStorage] = useState<Master[]>([]);
@@ -63,6 +42,8 @@ const BlankPage = () => {
   const [supplyCategories, setSupplyCategories] = useState<Master[]>([]);
   const [supplySubCategories, setSupplySubCategories] = useState<Master[]>([]);
   const [supplyColors, setSupplyColors] = useState<Record<string, any>[]>([]);
+
+  const selectInputRef: any = useRef();
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -77,8 +58,10 @@ const BlankPage = () => {
       supplier_id: null,
       iva: 0,
       supply_inventory_storage_id: null,
-      description: null,
-      base64: null
+      description: "",
+      base64: null,
+      heigth: 0,
+      width: 0,
     },
   });
 
@@ -131,7 +114,33 @@ const BlankPage = () => {
     }
   };
 
-  const onSubmit = async (data: any) => {};
+  const onSubmit = async (data: any) => {
+    setLoading(true);
+    const file = data.base64[0]
+      ? await convertFileToBase64(data.base64[0])
+      : "";
+    const response = await createSupply(
+      mapFormToSupplyCreate({
+        ...data,
+        base64: file,
+        heigth: 0,
+        width: 0,
+        inventories: inventories.map((e) => ({
+          ...e,
+          last_price: e.unit_value,
+        })),
+      })
+    );
+    setLoading(false);
+    selectInputRef?.current?.clearValue();
+    reset();
+    setInventories([]);
+    setSupplyColors([]);
+    toast({
+      title: "Se registro el insumo correctamente",
+      color: "success",
+    });
+  };
 
   const filterColor = async () => {
     const result: Record<string, any> = await listColorSupplier({
@@ -164,6 +173,7 @@ const BlankPage = () => {
             color_name: newItem.label,
             supply_color_supplier_id: newItem.idcolor,
             supply_color_id: newItem.value,
+            cloth_color_supplier_id: null,
             supply_code: "",
             quantity: 0,
             unit_value: 0,
@@ -176,9 +186,17 @@ const BlankPage = () => {
     });
   };
 
+  const updateInventoryValue = (key: string, value: any, index: number) => {
+    setInventories((prev) => {
+      prev[index][key] = value;
+      return prev;
+    });
+  };
+
   return (
     <div>
       <Breadcrumbs>
+        <BreadcrumbItem>Administrativo</BreadcrumbItem>
         <BreadcrumbItem>Insumos</BreadcrumbItem>
         <BreadcrumbItem className="text-primary">Nuevo Insumo</BreadcrumbItem>
       </Breadcrumbs>
@@ -314,7 +332,7 @@ const BlankPage = () => {
                             })}
                             htmlFor="name"
                           >
-                            Suncategoria
+                            Subcategoria
                           </FormLabel>
                           <FormControl>
                             <Select
@@ -497,16 +515,27 @@ const BlankPage = () => {
                   <div className="flex flex-col gap-2 space-y-2">
                     <FormLabel htmlFor="name">Foto</FormLabel>
                     <Input type="file" id="name" {...register("base64")} />
+                    {errors.base64 && (
+                      <div className=" text-destructive mt-2">
+                        {errors.base64.message}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 mt-5">
                   <FormLabel htmlFor="name">Descripción</FormLabel>
                   <Textarea id="description" {...register("description")} />
+                  {errors.description && (
+                    <div className=" text-destructive mt-2">
+                      {errors.description.message}
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-[1fr_2fr] gap-5">
                   <div className="flex flex-col gap-2 mt-5">
                     <FormLabel htmlFor="name">Colores</FormLabel>
                     <Select
+                      ref={selectInputRef}
                       className="react-select"
                       classNamePrefix="select"
                       placeholder="Seleccione un color"
@@ -547,22 +576,49 @@ const BlankPage = () => {
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {inventories && inventories?.length ? (
-                          inventories?.map((e) => (
+                          inventories?.map((e, i) => (
                             <tr>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {e.color_name}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <Input type="text" id="iva" />
+                                <Input
+                                  type="text"
+                                  id="supply_code"
+                                  onChange={(e) =>
+                                    updateInventoryValue(
+                                      "supply_code",
+                                      e.target.value,
+                                      i
+                                    )
+                                  }
+                                />
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <Input type="number" id="iva" />
+                                <Input
+                                  type="number"
+                                  id="quantity"
+                                  onChange={(e) =>
+                                    updateInventoryValue(
+                                      "quantity",
+                                      e.target.value,
+                                      i
+                                    )
+                                  }
+                                />
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <CleaveInput
-                                  id="nu"
+                                  id="unit_value"
                                   options={{ numeral: true }}
                                   placeholder="10,000"
+                                  onChange={(e: any) =>
+                                    updateInventoryValue(
+                                      "unit_value",
+                                      e.target.rawValue,
+                                      i
+                                    )
+                                  }
                                 />
                               </td>
                             </tr>
@@ -583,7 +639,11 @@ const BlankPage = () => {
                 </div>
 
                 <div className="flex justify-end mt-5">
-                  <Button className="float-right" type="submit">
+                  <Button
+                    className="float-right"
+                    type="submit"
+                    disabled={loading}
+                  >
                     Guardar
                   </Button>
                 </div>
@@ -596,4 +656,4 @@ const BlankPage = () => {
   );
 };
 
-export default BlankPage;
+export default CreateSupplyPage;
