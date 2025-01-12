@@ -27,66 +27,6 @@ type InventoryData = {
 };
 
 
-type Inventory = {
-  id: number;
-  supply_id: number;
-  supply_color_supplier_id: number | null;
-  cloth_color_supplier_id: number | null;
-  supply_color_id: number;
-  supply_inventory_storage_id: number;
-  supply_code: string;
-  quantity: number;
-  last_price: number;
-  unit_value: number;
-  observation: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-type SupplyType = {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string | null;
-  type: number;
-};
-
-type SupplyCategory = {
-  id: number;
-  name: string;
-  destination: string;
-  created_at: string;
-  updated_at: string | null;
-};
-
-type SupplySubcategory = {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string | null;
-};
-
-type SupplyPresentation = {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string | null;
-};
-
-type SupplyLine = {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string | null;
-};
-
-type SupplyUnitOfMeasure = {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string | null;
-};
-
 type Supplier = {
   id: number;
   person_type_id: number;
@@ -112,39 +52,78 @@ type Supplier = {
   bank: string;
   payment_option: string;
   invoice_deadline: string;
-  type_service: string; // Consider parsing JSON strings to arrays if necessary
-  type_third_parties: string; // Same as above
+  type_service: string;
+  type_third_parties: string;
   is_self_retaining: number;
   nationality: string;
   url_website: string | null;
   url_facebook: string | null;
   url_twitter: string | null;
   created_at: string;
-  updated_at: string | null;
+  updated_at: string;
   deleted_at: string | null;
 };
 
-export type Supply = {
+type SupplyDetails = {
+  id: number;
+  name: string;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type ColorSupplier = {
+  id: number;
+  name: string;
+  supply_color_id: number;
+  suppliers_id: number;
+  supply_categories_id?: number;
+  supply_types_id?: number,
+  created_at: string;
+  updated_at: string;
+  code: string | null;
+};
+
+export type Inventory = {
+  id: number;
+  supply_id: number;
+  supply_color_supplier_id: number | null;
+  cloth_color_supplier_id: number | null;
+  supply_color_id: number;
+  supply_inventory_storage_id: number;
+  supply_code: string;
+  quantity: number;
+  last_price: number;
+  observation: string | null;
+  created_at: string;
+  updated_at: string;
+  unit_value: number;
+  supply_color: SupplyDetails;
+  supply_inventory_storage: SupplyDetails;
+  supply_color_supplier: ColorSupplier | null;
+  cloth_color_supplier: ColorSupplier | null;
+};
+
+export type Supply= {
   id: number;
   supply_type_id: number;
   supply_category_id: number;
-  supply_subcategory_id: number;
+  supply_subcategory_id: number | null;
   supply_presentation_id: number;
   supply_line_id: number;
   supply_unit_of_measure_id: number;
   supplier_id: number;
   width: number;
   heigth: number;
-  path_photo: string;
+  path_photo: string | null;
   created_at: string;
   updated_at: string;
   iva: number;
-  supply_type: SupplyType;
-  supply_category: SupplyCategory;
-  supply_subcategory: SupplySubcategory;
-  supply_presentation: SupplyPresentation;
-  supply_line: SupplyLine;
-  supply_unit_of_measure: SupplyUnitOfMeasure;
+  supply_type: SupplyDetails;
+  supply_category: SupplyDetails;
+  supply_subcategory: SupplyDetails | null;
+  supply_presentation: SupplyDetails;
+  supply_line: SupplyDetails;
+  supply_unit_of_measure: SupplyDetails;
   supplier: Supplier;
   inventories: Inventory[];
 };

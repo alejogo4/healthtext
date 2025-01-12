@@ -58,7 +58,7 @@ const CreateSupplyPage = () => {
       supplier_id: null,
       iva: 0,
       supply_inventory_storage_id: null,
-      description: "",
+      observation: "",
       base64: null,
       heigth: 0,
       width: 0,
@@ -119,7 +119,7 @@ const CreateSupplyPage = () => {
     const file = data.base64[0]
       ? await convertFileToBase64(data.base64[0])
       : "";
-    const response = await createSupply(
+    const response: any = await createSupply(
       mapFormToSupplyCreate({
         ...data,
         base64: file,
@@ -132,14 +132,21 @@ const CreateSupplyPage = () => {
       })
     );
     setLoading(false);
-    selectInputRef?.current?.clearValue();
-    reset();
-    setInventories([]);
-    setSupplyColors([]);
-    toast({
-      title: "Se registro el insumo correctamente",
-      color: "success",
-    });
+    if (response?.status) {
+      selectInputRef?.current?.clearValue();
+      reset();
+      setInventories([]);
+      setSupplyColors([]);
+      toast({
+        title: "Se registro la tela correctamente",
+        color: "success",
+      });
+    } else {
+      toast({
+        title: "No fue posible guardar el registro, por favor valida los datos ingresados o intenta de nuevo",
+        color: "destructive",
+      });
+    }
   };
 
   const filterColor = async () => {
@@ -524,10 +531,10 @@ const CreateSupplyPage = () => {
                 </div>
                 <div className="flex flex-col gap-2 mt-5">
                   <FormLabel htmlFor="name">Descripción</FormLabel>
-                  <Textarea id="description" {...register("description")} />
-                  {errors.description && (
+                  <Textarea id="observation" {...register("observation")} />
+                  {errors.observation && (
                     <div className=" text-destructive mt-2">
-                      {errors.description.message}
+                      {errors.observation.message}
                     </div>
                   )}
                 </div>

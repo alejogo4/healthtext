@@ -21,7 +21,7 @@ export const schema = z.object({
     .required(),
   base64: z.any().optional(),
   iva: z.preprocess((value: any) => Number(value), z.number()),
-  description: z.string().optional(),
+  observation: z.string().optional(),
 });
 
 export const schemaCloth = z.object({
@@ -44,7 +44,7 @@ export const schemaCloth = z.object({
   iva: z.preprocess((value: any) => Number(value), z.number()),
   width: z.preprocess((value: any) => Number(value), z.number()),
   heigth: z.preprocess((value: any) => Number(value), z.number()),
-  description: z.string().optional(),
+  observation: z.string().optional(),
 });
 
 export type FormSchema = z.infer<typeof schema>;

@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
-import { Supply } from "../types/supply";
+import { ReactDataTableStatic } from "@/components/ui/react-data-table-static";
+import { Supply, Inventory } from "../types/supply";
 import { listSupply } from "./services/crudSupply";
-import DataTable from "react-data-table-component";
 import { MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,44 +11,76 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { convertTextToMoney } from "@/util/money";
+import { SiteLogo } from "@/components/svg";
 
-const MaterialListPage = () => {
+const ClothListPage = () => {
   const [data, setData] = useState<Supply[] | []>([]);
+  const [dataDetail, setDataDetail] = useState<Supply | null>();
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const columns = [
+    {
+      name: "",
+      cell: (row: Supply) =>
+        row.path_photo ? (
+          <img src={row.path_photo} className="h-7 w-7" />
+        ) : (
+          <SiteLogo className="h-7 w-7" />
+        ),
+      width: "70px",
+    },
     {
       name: "Proveedor",
       selector: (row: Supply) => row.supplier.name,
       sortable: true,
+      filterKey: "supplier.name",
     },
     {
       name: "Tipo",
       selector: (row: Supply) => row.supply_type.name,
       sortable: true,
+      filterKey: "supply_type.name",
     },
     {
       name: "Categoria",
       selector: (row: Supply) => row.supply_category.name,
       sortable: true,
+      filterKey: 'supply_category.name'
     },
     {
       name: "Presentación",
       selector: (row: Supply) => row.supply_presentation.name,
       sortable: true,
+      filterKey: 'supply_presentation.name'
     },
     {
       name: "Unidad de medida",
       selector: (row: Supply) => row.supply_unit_of_measure.name,
       sortable: true,
+      filterKey: 'supply_unit_of_measure.name'
     },
     {
-      name: "Tamaño",
-      cell: (row: Supply) => <div>{row.width}X{row.heigth} MTS</div>,
+      name: "Linea",
+      selector: (row: Supply) => row.supply_line.name,
+      sortable: true,
+      filterKey: 'supply_line.name'
+    },
+    {
+      name: "Iva",
+      cell: (row: Supply) => `${row.iva ?? 0}%`,
     },
     {
       name: "",
@@ -89,7 +121,10 @@ const MaterialListPage = () => {
     setLoading(false);
   };
 
-  const onopenInventoryModal = (item: Supply) => {};
+  const onopenInventoryModal = (item: Supply) => {
+    setDataDetail(item);
+    setIsModalOpen(true);
+  };
 
   const onEdit = (item: Supply) => {};
 
@@ -101,16 +136,73 @@ const MaterialListPage = () => {
         <BreadcrumbItem className="text-primary">Listar Telas</BreadcrumbItem>
       </Breadcrumbs>
       <div className="mt-5">
-        <DataTable
+        <ReactDataTableStatic
           columns={columns}
           data={data}
           progressPending={loading}
-          pagination
+          expandableRows={true}
+          expandableRowsComponent={(row:any) => (
+            <div className="p-6 flex flex-col">
+              <b >Descripción</b>
+              <p>{row.observation ?? 'N/A'}</p>
+            </div>
+          )}
         />
       </div>
-      
+
+      <Dialog open={isModalOpen}>
+        <DialogContent
+          className="overflow-y-auto max-h-screen p-0"
+          size="4xl"
+          onClose={() => setIsModalOpen(!open)}
+        >
+          <div className="w-full p-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Código del proveedor</TableHead>
+                  <TableHead>Color</TableHead>
+                  <TableHead>Cantidad</TableHead>
+                  <TableHead>Precio unitario</TableHead>
+                  <TableHead>Ultimo precio</TableHead>
+                  <TableHead>Bodega</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {dataDetail?.inventories.map((item: Inventory) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="text-center">
+                      {item.supply_code}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {item.cloth_color_supplier
+                        ? `${item.cloth_color_supplier?.code ?? ""} ${
+                            item.cloth_color_supplier?.name ?? ""
+                          }`
+                        : null}{" "}
+                      {item.supply_color.name}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {item.quantity}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {convertTextToMoney(item.unit_value.toString())}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {convertTextToMoney(item.last_price.toString())}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {item.supply_inventory_storage.name}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default MaterialListPage;
+export default ClothListPage;

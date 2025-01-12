@@ -8,7 +8,7 @@ export const createSupply = async (body: any) => {
       body,
       'POST'
     );
-    return data.data;
+    return data;
   } catch (error) {
     console.error('Error al obtener datos:', error);
     return [];
