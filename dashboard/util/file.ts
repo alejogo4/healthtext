@@ -16,4 +16,19 @@ function getImage(fileUrl: string):string{
   return `${process.env.NEXT_PUBLIC_SITE_URL}${fileUrl}`
 }
 
-export { convertFileToBase64, removeFileExtension, getImage};
+const extractExtensionFromBase64 = (base64String: string): string | null => {
+  const match = base64String.match(/^data:image\/([a-zA-Z0-9+]+);base64,/);
+  return match ? match[1] : null;
+};
+
+const toBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
+
+
+export { convertFileToBase64, removeFileExtension, getImage, extractExtensionFromBase64, toBase64};

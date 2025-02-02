@@ -11,7 +11,7 @@ const Step5: FC = () => {
 
   const typeConfigServices = watch('typeConfigServices');
   const category_bases_code = watch('category_bases_code');
-  console.log(typeConfigServices);
+ 
 
   const type_config =
     typeConfigServices.silhouettes.length > 0
@@ -24,6 +24,7 @@ const Step5: FC = () => {
       : 'typeConfigServices.boot_types';
 
   const measurementCategory = getValues('measurementCategory');
+
 
   const specialVariant =
     category_bases_code == 'B' || category_bases_code == 'P';
@@ -63,6 +64,8 @@ const Step5: FC = () => {
   if (isLoading) {
     return <p>Cargando datos...</p>;
   }
+
+  console.log(typeConfigServices, 'typeConfigServices');
 
   return (
     <div className='mt-4'>

@@ -223,6 +223,16 @@ export const menusConfig: Record<string, any> = {
                 href: '/design/variants/list'
               }
             ]
+          },,
+          {
+            title: 'Costeo',
+            icon: Components,
+            nested: [
+              {
+                title: 'Crear costeo variante',
+                href: '/cost/list'
+              }
+            ]
           },
           {
             title: 'Maestros',

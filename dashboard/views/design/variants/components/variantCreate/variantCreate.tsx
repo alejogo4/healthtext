@@ -93,7 +93,7 @@ function mapToMeasurementRequest(data: any): MeasurementRequest {
     sizes: data
       .map((item: any) => {
         return item.sizes.map((size: any) => ({
-          silhouettes_variant_id: item.garment_variant_id,
+          silhouettes_variant_id: item.id,
           size_id: size.size_id,
           measurement_categories: size.categories.map((category: any) => ({
             measurement_category_id: category.id,
@@ -111,7 +111,7 @@ function mapToBootMeasurementRequest(data: any): MeasurementRequest {
     sizes: data
       .map((item: any) => {
         return item.sizes.map((size: any) => ({
-          boot_type_variant_id: item.garment_variant_id,
+          boot_type_variant_id: item.id,
           size_id: size.size_id,
           measurement_categories: size.categories.map((category: any) => ({
             measurement_category_id: category.id,
@@ -120,6 +120,20 @@ function mapToBootMeasurementRequest(data: any): MeasurementRequest {
         }));
       })
       .flat(),
+    lengths: []
+  };
+}
+
+function mapToGeneralMeasurementRequest(sizes: any): MeasurementRequest {
+  return {
+    sizes: sizes.map((size: any) => ({
+      garment_variant_id: size.garment_variant_id,
+      size_id: size.size_id,
+      measurement_categories: size.categories.map((category: any) => ({
+        measurement_category_id: category.id,
+        value: parseFloat(category.value)
+      }))
+    })),
     lengths: []
   };
 }
@@ -237,12 +251,15 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
       const boot = typeConfigServices.boot_types;
       const body: MeasurementRequest = mapToBootMeasurementRequest(boot);
       response = await saveMeasurement(body, 'boot_type');
+    } else {
+      const sizes = typeConfigServices.sizes;
+      const body: MeasurementRequest = mapToGeneralMeasurementRequest(sizes);
+      response = await saveMeasurement(body, 'others');
     }
     return response;
   };
 
   const saveFilesVariantHandler = async () => {
-
     if (category_bases_code == 'B') {
       const sil: SilhouetteVariant[] = typeConfigServices.silhouettes;
 
@@ -401,9 +418,9 @@ const VariantCreate: FC<Props> = ({ bases = [] }) => {
       const response = await saveBaseVariant(body);
       if (response) {
         setValue('variant_id', response?.id ?? 0);
-        setValue('typeConfigServices', response); 
+        setValue('typeConfigServices', response);
       }
-      if(category_bases_code == 'I'){
+      if (category_bases_code == 'I') {
         setActiveStep(prevActiveStep => prevActiveStep + 2);
       }
     }

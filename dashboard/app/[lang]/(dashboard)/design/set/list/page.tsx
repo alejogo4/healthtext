@@ -1,1 +1,1 @@
-export { default } from '@/views/design/base/baseList'
+export { default } from '@/views/design/set/setList'

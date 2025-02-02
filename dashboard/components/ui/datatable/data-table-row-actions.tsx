@@ -19,6 +19,7 @@ interface DataTableRowActionsProps {
   onPressView?: () => void;
   onPressDelete?: (id: string) => void;
   id?: string;
+  items?: React.ReactNode | React.ReactNode[]
 }
 
 export function DataTableRowActions({
@@ -26,7 +27,8 @@ export function DataTableRowActions({
   onPressEdit,
   onPressView,
   onPressDelete,
-  id=''
+  id='',
+  items,
 }: DataTableRowActionsProps) {
   return (
     <DropdownMenu>
@@ -42,6 +44,7 @@ export function DataTableRowActions({
       <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem onClick={onPressEdit}>Editar</DropdownMenuItem>
         <DropdownMenuItem onClick={onPressView}>Ver</DropdownMenuItem>
+        {items}
         {/* <DropdownMenuItem>Favorite</DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
@@ -49,6 +52,7 @@ export function DataTableRowActions({
           Eliminar
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
+        
       </DropdownMenuContent>
     </DropdownMenu>
   );

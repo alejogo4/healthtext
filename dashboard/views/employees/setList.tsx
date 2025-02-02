@@ -8,22 +8,21 @@ import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import toast from 'react-hot-toast';
 import {
   BaseType,
   CategoryBases,
   deleteBase,
   GenderTypes,
-  listBase,
   listBaseClient
 } from './services/crudBase';
-import toast from 'react-hot-toast';
 
-const BaseList = () => {
+const SetList = () => {
   const [data, setData] = useState<BaseType[] | []>([]);
   const [loading, setLoading] = useState(false);
 
   //Supplier
-  const [selectedClient, setSelectedClient] = useState<BaseType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<BaseType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const BaseList = () => {
 
   const onViewData = (row: BaseType) => {
     setIsModalOpen(true);
-    setSelectedClient(row);
+    setSelectedItem(row);
   };
 
   const columnsdt: ColumnDef<BaseType>[] = [
@@ -143,10 +142,10 @@ const BaseList = () => {
           onClose={() => setIsModalOpen(!open)}
         >
           <div className='w-full max-h-[350px] overflow-scroll p-4'>
-            {selectedClient && (
+            {selectedItem && (
               <div className='w-full'>
                 <h2 className='text-3xl font-bold text-gray-800 mb-6 text-center'>
-                  {selectedClient.name}
+                  {selectedItem.name}
                 </h2>
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
@@ -259,4 +258,4 @@ const BaseList = () => {
   );
 };
 
-export default BaseList;
+export default SetList;

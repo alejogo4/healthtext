@@ -16,8 +16,10 @@ import {
   VariantResponse
 } from './services/crudVariants';
 import { ItemVariantDetail } from '@/views/types/variants';
-import { DropdownMenuItem, DropdownMenuShortcut } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
+import {
+  DropdownMenuItem,
+  DropdownMenuShortcut
+} from '@/components/ui/dropdown-menu';
 
 const VariantList = () => {
   const [data, setData] = useState<VariantResponse[] | []>([]);
@@ -90,16 +92,14 @@ const VariantList = () => {
     {
       id: 'actions',
       cell: ({ row }) => (
-        <DataTableRowActions
-          onPressView={() => onViewData(row.original)}
-          id={row.original.id.toString()}
-          row={row}
-          items={
-            <DropdownMenuItem>
-                <Link href={`photos/${row.original.id.toString()}`}>Agregar Fotos</Link>
-            </DropdownMenuItem>
-          }
-        />
+        <>
+          <DataTableRowActions
+            onPressView={() => onViewData(row.original)}
+            id={row.original.id.toString()}
+            row={row}
+            
+          />
+        </>
       )
     }
   ];

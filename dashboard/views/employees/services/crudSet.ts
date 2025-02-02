@@ -1,5 +1,4 @@
 import { ApiResponse, httpRequest } from '@/config/axios.config';
-import { SetList } from '@/views/types/sets';
 
 export interface RequestCreateSet {
   set_name: string;
@@ -9,7 +8,7 @@ export interface RequestCreateSet {
 
 export const ListSet = async () => {
   try {
-    const data = await httpRequest<ApiResponse<SetList[]>>(
+    const data = await httpRequest<ApiResponse<RequestCreateSet[]>>(
       '/sets',
       undefined,
       'GET'
