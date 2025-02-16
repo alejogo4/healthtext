@@ -104,3 +104,19 @@ export { default as Nueve } from "./menu/9.svg";
 export { default as Diez } from "./menu/10.svg";
 export { default as Once } from "./menu/11.svg";
 export { default as Doce } from "./menu/12.svg";
+
+//Base
+export { default as A } from "./base/A.svg";
+export { default as C } from "./base/C.svg";
+export { default as B } from "./base/B.svg";
+export { default as G } from "./base/G.svg";
+export { default as H } from "./base/H.svg";
+export { default as I } from "./base/I.svg";
+export { default as K } from "./base/K.svg";
+export { default as P } from "./base/P.svg";
+export { default as Q } from "./base/Q.svg";
+export { default as T } from "./base/T.svg";
+export { default as V } from "./base/V.svg";
+export { default as X } from "./base/X.svg";
+export { default as Z } from "./base/Z.svg";
+
