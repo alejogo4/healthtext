@@ -1,101 +1,89 @@
-import Image from "next/image";
+import Image from 'next/image';
+import Script from 'next/script';
+
+import Header from '@components/home/Header';
+import MainSlider from '@components/home/MainSlider';
+import AboutSection from '@components/home/AboutSection';
+import LookbookSection from '@components/home/LookbookSection';
+import CategorySection from '@components/home/CategorySection';
+import MarqueeSection from '@components/home/MarqueeSection';
+import ProductsSlider from '@components/home/ProductsSlider';
+import CollectionSection from '@components/home/CollectionSection';
+import TrendingSection from '@components/home/TrendingSection';
+import IntroSection from '@components/home/IntroSection';
+import TestimonialSection from '@components/home/TestimonialSection';
+import FeaturedProducts from '@components/home/FeaturedProducts';
+import BannerSection from '@components/home/BannerSection';
+import BrandSection from '@components/home/BrandSection';
+import CartSection from '@components/home/CartSection';
+import LatestNewsSection from '@components/home/LatestNewsSection';
+import Footer from '@components/home/Footer';
+import CartSidebar from '@components/home/CartSidebar';
+import SearchBox from '@components/home/SearchBox';
+import QuickViewPopup from '@components/home/QuickViewPopup';
+import OverlayMenu from '@components/home/OverlayMenu';
+import SubscribePopup from '@components/home/SubscribePopup';
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <>
+      <div className='page-wrapper home1'>
+        <div className='pointer' id='pointer'></div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <Header />
+        <CartSidebar />
+        <SearchBox />
+        <QuickViewPopup />
+        <OverlayMenu />
+
+        <MainSlider />
+        <AboutSection />
+        <LookbookSection />
+        <CategorySection />
+        <MarqueeSection />
+        <ProductsSlider />
+        <CollectionSection />
+        <TrendingSection />
+        <IntroSection />
+        <TestimonialSection />
+        <FeaturedProducts />
+        <BannerSection />
+        <BrandSection />
+        <CartSection />
+        <LatestNewsSection />
+        <Footer />
+      </div>
+
+      {/* Scroll To Top */}
+      <div className='scroll-to-top scroll-to-target' data-target='html'>
+        <span className='fa fa-angle-up'></span>
+      </div>
+
+      <SubscribePopup />
+
+      <Script src='js/jquery.js' strategy='beforeInteractive' />
+      <Script
+        src='js/jquery-migrate-1.4.1.min.js'
+        strategy='beforeInteractive'
+      />
+      <Script src='js/slick.min.js' strategy='beforeInteractive' />
+      <Script src='js/slick-animation.min.js' strategy='beforeInteractive' />
+      <Script src='js/popper.min.js' strategy='beforeInteractive' />
+      <Script src='js/bootstrap.min.js' strategy='beforeInteractive' />
+      <Script src='js/jquery.fancybox.js' strategy='beforeInteractive' />
+      <Script src='js/wow.js' strategy='beforeInteractive' />
+      <Script src='js/appear.js' strategy='beforeInteractive' />
+      <Script src='js/swiper-bundle.min.js' strategy='beforeInteractive' />
+      <Script src='js/jquery.marquee.min.js' strategy='beforeInteractive' />
+      <Script
+        src='/js/masonry.pkgd.min.js'
+        integrity='sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D'
+        crossOrigin='anonymous'
+        async
+        strategy='afterInteractive'
+      />
+      <Script src='js/video.js' strategy='afterInteractive' />
+      <Script src='js/script.js' strategy='afterInteractive' />
+    </>
   );
 }
