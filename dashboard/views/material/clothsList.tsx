@@ -67,6 +67,12 @@ const ClothListPage = () => {
       filterKey: 'supply_presentation.name'
     },
     {
+      name: "Cantidad X Presentación",
+      selector: (row: Supply) => row.quantity_by_presentation,
+      sortable: true,
+      filterKey: 'quantity_by_presentation'
+    },
+    {
       name: "Unidad de medida",
       selector: (row: Supply) => row.supply_unit_of_measure.name,
       sortable: true,
@@ -163,8 +169,8 @@ const ClothListPage = () => {
                   <TableHead>Código del proveedor</TableHead>
                   <TableHead>Color</TableHead>
                   <TableHead>Cantidad</TableHead>
-                  <TableHead>Precio unitario</TableHead>
-                  <TableHead>Ultimo precio</TableHead>
+                  <TableHead>Precio Real</TableHead>
+                  <TableHead>Precio Comercial</TableHead>
                   <TableHead>Bodega</TableHead>
                 </TableRow>
               </TableHeader>
@@ -186,10 +192,10 @@ const ClothListPage = () => {
                       {item.quantity}
                     </TableCell>
                     <TableCell className="text-center">
-                      {convertTextToMoney(item.unit_value.toString())}
+                      {convertTextToMoney(item.real_price.toString())}
                     </TableCell>
                     <TableCell className="text-center">
-                      {convertTextToMoney(item.last_price.toString())}
+                      {convertTextToMoney(item.commercial_price.toString())}
                     </TableCell>
                     <TableCell className="text-center">
                       {item.supply_inventory_storage.name}

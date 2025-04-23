@@ -11,6 +11,7 @@ export const schema = z.object({
   supply_presentation_id: z
     .object({ value: z.string(), label: z.string() })
     .required(),
+  quantity_by_presentation: z.preprocess((value: any) => Number(value), z.number()),
   supply_line_id: z.object({ value: z.string(), label: z.string() }).required(),
   supply_unit_of_measure_id: z
     .object({ value: z.string(), label: z.string() })
@@ -33,6 +34,7 @@ export const schemaCloth = z.object({
     .object({ value: z.string(), label: z.string() })
     .required(),
   supply_line_id: z.object({ value: z.string(), label: z.string() }).required(),
+  quantity_by_presentation: z.preprocess((value: any) => Number(value), z.number()),
   supply_unit_of_measure_id: z
     .object({ value: z.string(), label: z.string() })
     .required(),

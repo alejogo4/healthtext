@@ -49,6 +49,7 @@ const CreateSupplyPage = () => {
     resolver: zodResolver(schema),
     mode: "all",
     defaultValues: {
+      quantity_by_presentation: 0,
       supply_type_id: null,
       supply_category_id: null,
       supply_subcategory_id: null,
@@ -127,7 +128,6 @@ const CreateSupplyPage = () => {
         width: 0,
         inventories: inventories.map((e) => ({
           ...e,
-          last_price: e.unit_value,
         })),
       })
     );
@@ -143,7 +143,8 @@ const CreateSupplyPage = () => {
       });
     } else {
       toast({
-        title: "No fue posible guardar el registro, por favor valida los datos ingresados o intenta de nuevo",
+        title:
+          "No fue posible guardar el registro, por favor valida los datos ingresados o intenta de nuevo",
         color: "destructive",
       });
     }
@@ -183,8 +184,8 @@ const CreateSupplyPage = () => {
             cloth_color_supplier_id: null,
             supply_code: "",
             quantity: 0,
-            unit_value: 0,
-            last_price: 0,
+            real_price: 0,
+            commercial_price: 0,
           });
         }
       });
@@ -397,41 +398,26 @@ const CreateSupplyPage = () => {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <Controller
-                      control={form.control}
-                      name="supply_line_id"
-                      render={({ field: { onChange, onBlur, value, ref } }) => (
-                        <FormItem>
-                          <FormLabel
-                            className={cn("", {
-                              "text-destructive":
-                                form.formState.errors.supply_line_id,
-                            })}
-                            htmlFor="name"
-                          >
-                            Linea
-                          </FormLabel>
-                          <FormControl>
-                            <Select
-                              className="react-select"
-                              classNamePrefix="select"
-                              placeholder="Seleccione un proveedor"
-                              options={arrayToReactSelect(supplyLine)}
-                              onChange={onChange}
-                              onBlur={onBlur}
-                              value={value}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
+                  <div className="flex flex-col gap-2 space-y-2">
+                    <FormLabel htmlFor="name">
+                      Cantidad por presentación
+                    </FormLabel>
+                    <Input
+                      type="number"
+                      id="quantity_by_presentation"
+                      {...register("quantity_by_presentation")}
+                      className={cn("", {
+                        "text-destructive":
+                          form.formState.errors.quantity_by_presentation,
+                      })}
                     />
-                    {errors.supply_line_id && (
+                    {errors.quantity_by_presentation && (
                       <div className=" text-destructive mt-2">
-                        {errors.supply_line_id.message}
+                        {errors.quantity_by_presentation.message}
                       </div>
                     )}
                   </div>
+
                   <div className="flex flex-col gap-2">
                     <Controller
                       control={form.control}
@@ -467,6 +453,43 @@ const CreateSupplyPage = () => {
                       </div>
                     )}
                   </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Controller
+                      control={form.control}
+                      name="supply_line_id"
+                      render={({ field: { onChange, onBlur, value, ref } }) => (
+                        <FormItem>
+                          <FormLabel
+                            className={cn("", {
+                              "text-destructive":
+                                form.formState.errors.supply_line_id,
+                            })}
+                            htmlFor="name"
+                          >
+                            Linea
+                          </FormLabel>
+                          <FormControl>
+                            <Select
+                              className="react-select"
+                              classNamePrefix="select"
+                              placeholder="Seleccione un proveedor"
+                              options={arrayToReactSelect(supplyLine)}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              value={value}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    {errors.supply_line_id && (
+                      <div className=" text-destructive mt-2">
+                        {errors.supply_line_id.message}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="flex flex-col gap-2">
                     <Controller
                       control={form.control}
@@ -577,7 +600,13 @@ const CreateSupplyPage = () => {
                             scope="col"
                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                           >
-                            Valor unitario
+                            Valor unitario real
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Valor unitario comercial
                           </th>
                         </tr>
                       </thead>
@@ -616,12 +645,26 @@ const CreateSupplyPage = () => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <CleaveInput
-                                  id="unit_value"
+                                  id="real_price"
                                   options={{ numeral: true }}
                                   placeholder="10,000"
                                   onChange={(e: any) =>
                                     updateInventoryValue(
-                                      "unit_value",
+                                      "real_price",
+                                      e.target.rawValue,
+                                      i
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <CleaveInput
+                                  id="commercial_price"
+                                  options={{ numeral: true }}
+                                  placeholder="10,000"
+                                  onChange={(e: any) =>
+                                    updateInventoryValue(
+                                      "commercial_price",
                                       e.target.rawValue,
                                       i
                                     )

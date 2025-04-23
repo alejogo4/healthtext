@@ -1,4 +1,5 @@
 type SupplyData = {
+  quantity_by_presentation: number;
   supply_type_id: number;
   supply_category_id: number;
   supply_subcategory_id: number;
@@ -25,7 +26,6 @@ type InventoryData = {
   observation: string;
   supply_inventory_storage_id: number;
 };
-
 
 type Supplier = {
   id: number;
@@ -77,7 +77,7 @@ type ColorSupplier = {
   supply_color_id: number;
   suppliers_id: number;
   supply_categories_id?: number;
-  supply_types_id?: number,
+  supply_types_id?: number;
   created_at: string;
   updated_at: string;
   code: string | null;
@@ -92,19 +92,20 @@ export type Inventory = {
   supply_inventory_storage_id: number;
   supply_code: string;
   quantity: number;
-  last_price: number;
   observation: string | null;
   created_at: string;
   updated_at: string;
-  unit_value: number;
+  real_price: number;
+  commercial_price: number;
   supply_color: SupplyDetails;
   supply_inventory_storage: SupplyDetails;
   supply_color_supplier: ColorSupplier | null;
   cloth_color_supplier: ColorSupplier | null;
 };
 
-export type Supply= {
+export type Supply = {
   id: number;
+  quantity_by_presentation: number;
   supply_type_id: number;
   supply_category_id: number;
   supply_subcategory_id: number | null;
@@ -128,9 +129,9 @@ export type Supply= {
   inventories: Inventory[];
 };
 
-
 export const mapFormToSupplyCreate = (formData: any): SupplyData => {
   const {
+    quantity_by_presentation,
     supply_type_id,
     supply_category_id,
     supply_subcategory_id,
@@ -146,20 +147,23 @@ export const mapFormToSupplyCreate = (formData: any): SupplyData => {
     base64,
   } = formData;
 
-  const mappedInventories: InventoryData[] = inventories.map((inventory: any) => ({
-    supply_id: inventory.supply_id,
-    supply_color_supplier_id: inventory.supply_color_supplier_id,
-    cloth_color_supplier_id: inventory.cloth_color_supplier_id,
-    supply_color_id: inventory.supply_color_id,
-    supply_code: inventory.supply_code,
-    quantity: inventory.quantity,
-    last_price: inventory.last_price,
-    unit_value: inventory.unit_value,
-    observation: inventory.observation,
-    supply_inventory_storage_id: supply_inventory_storage_id?.value,
-  }));
+  const mappedInventories: InventoryData[] = inventories.map(
+    (inventory: any) => ({
+      supply_id: inventory.supply_id,
+      supply_color_supplier_id: inventory.supply_color_supplier_id,
+      cloth_color_supplier_id: inventory.cloth_color_supplier_id,
+      supply_color_id: inventory.supply_color_id,
+      supply_code: inventory.supply_code,
+      quantity: inventory.quantity,
+      real_price: inventory.real_price,
+      commercial_price: inventory.commercial_price,
+      observation: inventory.observation,
+      supply_inventory_storage_id: supply_inventory_storage_id?.value,
+    })
+  );
 
   return {
+    quantity_by_presentation: Number(quantity_by_presentation),
     supply_type_id: Number(supply_type_id?.value),
     supply_category_id: Number(supply_category_id?.value),
     supply_subcategory_id: Number(supply_subcategory_id?.value),
